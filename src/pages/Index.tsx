@@ -3,8 +3,11 @@ import { SearchToggle } from "@/components/SearchToggle";
 import { ServiceCard } from "@/components/ServiceCard";
 import { FreelancerCard } from "@/components/FreelancerCard";
 import { CategoryGrid } from "@/components/CategoryGrid";
+import { FreelancerRegistrationForm } from "@/components/FreelancerRegistrationForm";
+import { ProjectPostForm } from "@/components/ProjectPostForm";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { 
   Sparkles, 
   Users, 
@@ -12,7 +15,9 @@ import {
   TrendingUp,
   Star,
   Shield,
-  Zap
+  Zap,
+  UserPlus,
+  Plus
 } from "lucide-react";
 import heroProfessionalsImage from "@/assets/hero-professionals-bg.jpg";
 
@@ -101,6 +106,8 @@ const mockFreelancers = [
 export default function Index() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searchMode, setSearchMode] = useState<'services' | 'freelancers'>('services');
+  const [isFreelancerModalOpen, setIsFreelancerModalOpen] = useState(false);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
   const handleSearch = (query: string, isAI: boolean) => {
     console.log(`Searching for: ${query} (AI: ${isAI})`);
@@ -135,9 +142,28 @@ export default function Index() {
             <Button variant="ghost" size="sm">
               Entrar
             </Button>
-            <Button variant="default" size="sm">
-              Cadastrar
-            </Button>
+            <Dialog open={isFreelancerModalOpen} onOpenChange={setIsFreelancerModalOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="flex items-center gap-2">
+                  <UserPlus className="h-4 w-4" />
+                  Ser Freelancer
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <FreelancerRegistrationForm onClose={() => setIsFreelancerModalOpen(false)} />
+              </DialogContent>
+            </Dialog>
+            <Dialog open={isProjectModalOpen} onOpenChange={setIsProjectModalOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Postar Projeto
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <ProjectPostForm onClose={() => setIsProjectModalOpen(false)} />
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </header>
