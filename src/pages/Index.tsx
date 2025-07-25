@@ -14,7 +14,7 @@ import {
   Shield,
   Zap
 } from "lucide-react";
-import heroImage from "@/assets/hero-marketplace.jpg";
+import heroProfessionalsImage from "@/assets/hero-professionals-bg.jpg";
 
 // Mock data for demonstration
 const mockServices = [
@@ -145,10 +145,15 @@ export default function Index() {
       {/* Hero Section */}
       <section className="relative py-20 lg:py-32 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-hero opacity-10" />
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-5"
-          style={{ backgroundImage: `url(${heroImage})` }}
-        />
+        
+        {/* Animated Video-like Background */}
+        <div className="absolute inset-0 opacity-20">
+          <div 
+            className="absolute inset-0 bg-cover bg-center animate-slow-zoom"
+            style={{ backgroundImage: `url(${heroProfessionalsImage})` }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/30 to-transparent" />
+        </div>
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
