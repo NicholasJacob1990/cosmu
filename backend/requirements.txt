@@ -1,0 +1,80 @@
+# Django and Core
+Django
+djangorestframework
+drf-nested-routers
+django-cors-headers
+python-decouple
+
+# Database
+psycopg2-binary
+django-redis
+
+# Authentication & Security
+djangorestframework-simplejwt
+django-allauth
+cryptography
+
+# File Storage
+boto3
+django-storages
+Pillow
+
+# Filtering and Search
+django-filter
+django-elasticsearch-dsl
+
+# File Processing
+python-magic
+
+# KYC and Validation
+requests
+phonenumbers
+
+# Background Tasks
+celery
+redis
+
+# Data Processing
+pandas
+numpy
+
+# Machine Learning (for future AI features)
+scikit-learn
+transformers
+
+# Monitoring and Logging
+sentry-sdk
+
+# Development and Testing
+pytest
+pytest-django
+factory-boy
+coverage
+
+# Code Quality
+flake8
+black
+isort
+
+# Documentation
+drf-spectacular
+
+# OCR and Document Processing
+pytesseract
+opencv-python
+
+# Payment Processing
+pagarme-python
+mercadopago
+
+# Utilities
+python-slugify
+python-dateutil
+pytz
+
+# WebSockets (for real-time features)
+channels
+channels-redis
+
+# Async support
+uvloop

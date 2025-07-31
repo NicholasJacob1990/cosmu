@@ -1,0 +1,395 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* GalaxIA Design System - Cosmic Light & Deep Space Themes */
+
+@layer base {
+  :root {
+    /* Cosmic Light Theme */
+    --bg-base: 0 0% 100%; /* #FFFFFF */
+    --surface-1: 220 20% 97%; /* #F4F7FA */
+    --grad-a: 210 100% 50%; /* #0078FF */
+    --grad-b: 271 76% 53%; /* #8A2BE2 */
+    --grad-c: 187 100% 43%; /* #00BFD8 */
+    --accent-neon: 187 100% 46%; /* #00DDEB */
+    --accent-magenta: 285 100% 50%; /* #BF00FF */
+    --future-dusk: 260 30% 45%; /* #5F4B8B */
+    --text-primary: 240 5% 11%; /* #1B1C24 */
+    --text-muted: 220 8% 46%; /* #646B7A */
+    --success: 167 72% 45%; /* #20C997 */
+    --warning: 35 100% 65%; /* #FFB74D */
+    --error: 0 84% 60%; /* #FF5252 */
+
+    /* Legacy compatibility - mapping to existing tokens */
+    --background: var(--bg-base);
+    --foreground: var(--text-primary);
+    --card: var(--surface-1);
+    --card-foreground: var(--text-primary);
+    --popover: var(--surface-1);
+    --popover-foreground: var(--text-primary);
+    --primary: var(--grad-a);
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: var(--accent-neon);
+    --secondary: var(--surface-1);
+    --secondary-foreground: var(--text-primary);
+    --muted: var(--surface-1);
+    --muted-foreground: var(--text-muted);
+    --accent: var(--accent-magenta);
+    --accent-foreground: 0 0% 100%;
+    --destructive: var(--error);
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: var(--grad-a);
+    --success: var(--success);
+    --success-foreground: 0 0% 100%;
+
+    /* GalaxIA Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--grad-a)) 0%, hsl(var(--grad-b)) 50%, hsl(var(--grad-c)) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(var(--grad-a)) 0%, hsl(var(--grad-b)) 50%, hsl(var(--grad-c)) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(var(--surface-1)) 0%, hsl(var(--bg-base)) 100%);
+    --gradient-text: linear-gradient(135deg, hsl(var(--grad-a)) 0%, hsl(var(--accent-magenta)) 100%);
+    --gradient-neon: linear-gradient(135deg, hsl(var(--accent-neon)) 0%, hsl(var(--grad-c)) 100%);
+    --gradient-future-dusk: linear-gradient(135deg, hsl(var(--future-dusk)) 0%, hsl(var(--grad-b)) 100%);
+    
+    /* Chart colors */
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+
+    /* Enhanced Shadows for Light Mode */
+    --shadow-elegant: 0 10px 25px -5px hsl(var(--text-primary) / 0.1);
+    --shadow-glow: 0 0 30px hsl(var(--accent-neon) / 0.2);
+    --shadow-card: 0 4px 12px -2px hsl(var(--text-primary) / 0.1);
+    --shadow-cosmic: 0 8px 25px -5px hsl(var(--accent-magenta) / 0.1);
+
+    /* Transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-cosmic: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* GalaxIA Spacing */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+    --space-3xl: 4rem;
+
+    /* Rounded corners */
+    --radius: 0.5rem;
+
+    /* Sidebar - Cosmic Light */
+    --sidebar-background: var(--surface-1);
+    --sidebar-foreground: var(--text-muted);
+    --sidebar-primary: var(--grad-a);
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: var(--bg-base);
+    --sidebar-accent-foreground: var(--text-primary);
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: var(--grad-a);
+  }
+
+  .dark {
+    /* Deep Space Theme */
+    --bg-base: 240 16% 7%; /* #0F1118 */
+    --surface-1: 240 12% 12%; /* #1A1E2E */
+    --grad-a: 210 100% 50%; /* #0078FF - same as light */
+    --grad-b: 271 76% 53%; /* #8A2BE2 - same as light */
+    --grad-c: 187 100% 43%; /* #00BFD8 - same as light */
+    --accent-neon: 187 100% 46%; /* #00DDEB - same as light */
+    --accent-magenta: 285 100% 50%; /* #BF00FF - same as light */
+    --future-dusk: 260 30% 45%; /* #5F4B8B - same as light */
+    --text-primary: 220 13% 91%; /* #E0E6F2 */
+    --text-muted: 220 8% 66%; /* #8A93A8 */
+    --success: 167 72% 45%; /* #20C997 - same as light */
+    --warning: 35 100% 65%; /* #FFB74D - same as light */
+    --error: 0 84% 60%; /* #FF5252 - same as light */
+
+    /* Legacy compatibility - mapping to existing tokens */
+    --background: var(--bg-base);
+    --foreground: var(--text-primary);
+    --card: var(--surface-1);
+    --card-foreground: var(--text-primary);
+    --popover: var(--surface-1);
+    --popover-foreground: var(--text-primary);
+    --primary: var(--accent-neon);
+    --primary-foreground: var(--bg-base);
+    --primary-glow: var(--accent-magenta);
+    --secondary: var(--surface-1);
+    --secondary-foreground: var(--text-primary);
+    --muted: var(--surface-1);
+    --muted-foreground: var(--text-muted);
+    --accent: var(--accent-magenta);
+    --accent-foreground: 0 0% 100%;
+    --destructive: var(--error);
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 6% 13%;
+    --input: 240 6% 13%;
+    --ring: var(--accent-neon);
+    --success: var(--success);
+    --success-foreground: var(--bg-base);
+
+    /* Deep Space Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--grad-a)) 0%, hsl(var(--grad-b)) 50%, hsl(var(--grad-c)) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(var(--future-dusk)) 0%, hsl(var(--grad-b)) 50%, hsl(var(--grad-c)) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(var(--surface-1)) 0%, hsl(var(--bg-base)) 100%);
+    --gradient-future-dusk: linear-gradient(135deg, hsl(var(--future-dusk)) 0%, hsl(var(--grad-b)) 100%);
+
+    /* Enhanced Shadows for Dark Mode */
+    --shadow-elegant: 0 10px 30px -10px hsl(var(--accent-neon) / 0.2);
+    --shadow-glow: 0 0 40px hsl(var(--accent-magenta) / 0.25);
+    --shadow-card: 0 4px 20px -4px hsl(var(--text-primary) / 0.05);
+    --shadow-cosmic: 0 8px 32px -8px hsl(var(--accent-magenta) / 0.15);
+
+    /* Sidebar - Deep Space */
+    --sidebar-background: var(--bg-base);
+    --sidebar-foreground: var(--text-muted);
+    --sidebar-primary: var(--accent-neon);
+    --sidebar-primary-foreground: var(--bg-base);
+    --sidebar-accent: var(--surface-1);
+    --sidebar-accent-foreground: var(--text-primary);
+    --sidebar-border: 240 6% 13%;
+    --sidebar-ring: var(--accent-neon);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  }
+
+  /* Cosmic animations */
+  @keyframes cosmic-float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(1deg); }
+  }
+
+  @keyframes star-twinkle {
+    0%, 100% { opacity: 0.1; }
+    50% { opacity: 0.3; }
+  }
+
+  @keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .cosmic-float {
+    animation: cosmic-float 6s ease-in-out infinite;
+  }
+
+  .star-twinkle {
+    animation: star-twinkle 3s ease-in-out infinite;
+  }
+
+  .gradient-shift {
+    background-size: 200% 200%;
+    animation: gradient-shift 5s ease-in-out infinite;
+  }
+}
+
+/* GalaxIA Component Classes */
+@layer components {
+  .galaxia-hero {
+    @apply relative overflow-hidden;
+    background: var(--gradient-hero);
+    background-size: 200% 200%;
+    animation: gradient-shift 8s ease-in-out infinite;
+  }
+
+  .galaxia-card {
+    @apply bg-card text-card-foreground rounded-lg border shadow-card;
+    background: var(--gradient-card);
+    transition: var(--transition-smooth);
+  }
+
+  .galaxia-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-elegant);
+  }
+
+  .galaxia-button-primary {
+    @apply bg-accent text-accent-foreground hover:bg-accent/90;
+    background: linear-gradient(135deg, hsl(var(--accent-magenta)), hsl(var(--accent-neon)));
+    transition: var(--transition-smooth);
+  }
+
+  .galaxia-button-primary:hover {
+    background: linear-gradient(135deg, hsl(var(--accent-neon)), hsl(var(--accent-magenta)));
+    box-shadow: var(--shadow-glow);
+  }
+
+  .galaxia-button-secondary {
+    @apply border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground;
+    transition: var(--transition-smooth);
+  }
+
+  .galaxia-text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+@layer utilities {
+  .galaxia-text-gradient {
+    @apply bg-gradient-to-r from-galaxia-grad-a to-galaxia-grad-c bg-clip-text text-transparent;
+  }
+
+  /* GalaxIA Text Colors - Using !important to override Tailwind */
+  .text-galaxia-text-primary {
+    color: hsl(var(--text-primary)) !important;
+  }
+
+  .text-galaxia-text-muted {
+    color: hsl(var(--text-muted)) !important;
+  }
+
+  .text-galaxia-neon {
+    color: hsl(var(--accent-neon)) !important;
+  }
+
+  .hover\:text-galaxia-neon:hover {
+    color: hsl(var(--accent-neon)) !important;
+  }
+
+  .bg-galaxia-surface {
+    background-color: hsl(var(--surface-1)) !important;
+  }
+
+  .hover\:bg-galaxia-surface:hover {
+    background-color: hsl(var(--surface-1)) !important;
+  }
+
+  .bg-galaxia-grad-a {
+    background-color: hsl(var(--grad-a)) !important;
+  }
+
+  .bg-galaxia-grad-b {
+    background-color: hsl(var(--grad-b)) !important;
+  }
+
+  .bg-galaxia-grad-c {
+    background-color: hsl(var(--grad-c)) !important;
+  }
+
+  .bg-galaxia-magenta {
+    background-color: hsl(var(--accent-magenta)) !important;
+  }
+
+  .bg-galaxia-neon {
+    background-color: hsl(var(--accent-neon)) !important;
+  }
+
+  .border-galaxia-grad-b {
+    border-color: hsl(var(--grad-b)) !important;
+  }
+
+  .hover\:bg-galaxia-grad-b:hover {
+    background-color: hsl(var(--grad-b)) !important;
+  }
+
+  .hover\:text-white:hover {
+    color: white !important;
+  }
+
+  .shadow-galaxia-glow {
+    box-shadow: 0 0 40px hsl(var(--accent-neon) / 0.2) !important;
+  }
+
+  .logo-light {
+    color: hsl(var(--text-primary));
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .logo-dark {
+    color: hsl(var(--text-primary));
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .logo-dark-filter {
+    filter: brightness(0) invert(1) !important;
+  }
+
+  /* Freelancer Card Button Fixes - Override shadcn defaults */
+  .freelancer-card button.inline-flex {
+    transition: all 0.2s ease-out !important;
+  }
+
+  /* Override shadcn focus styles */
+  .freelancer-card button.inline-flex:focus-visible {
+    outline: none !important;
+    box-shadow: 0 0 0 2px hsl(var(--accent-neon) / 0.3) !important;
+    background-color: transparent !important;
+  }
+
+  /* Override shadcn active states */
+  .freelancer-card button.inline-flex:active {
+    transform: scale(0.95) !important;
+  }
+
+  /* Outline button overrides */
+  .freelancer-card button.inline-flex.border {
+    background-color: transparent !important;
+  }
+
+  .freelancer-card button.inline-flex.border:hover {
+    background-color: hsl(var(--accent-neon) / 0.1) !important;
+    border-color: hsl(var(--accent-neon)) !important;
+    color: hsl(var(--accent-neon)) !important;
+  }
+
+  /* Default button overrides */
+  .freelancer-card button.inline-flex.bg-primary:hover {
+    background: linear-gradient(135deg, hsl(var(--accent-neon)), hsl(var(--accent-magenta))) !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 20px hsl(var(--accent-neon) / 0.3) !important;
+  }
+
+  /* Dark mode specific overrides */
+  .dark .freelancer-card button.inline-flex {
+    background-color: transparent !important;
+  }
+
+  .dark .freelancer-card button.inline-flex:focus-visible,
+  .dark .freelancer-card button.inline-flex:active {
+    background-color: transparent !important;
+  }
+
+  .dark .freelancer-card button.inline-flex.border {
+    border-color: hsl(var(--border)) !important;
+    color: hsl(var(--muted-foreground)) !important;
+    background-color: transparent !important;
+  }
+
+  .dark .freelancer-card button.inline-flex.border:hover {
+    background-color: hsl(var(--accent-neon) / 0.15) !important;
+    border-color: hsl(var(--accent-neon)) !important;
+    color: hsl(var(--accent-neon)) !important;
+  }
+
+  /* Remove any gray overlays */
+  .dark .freelancer-card button.inline-flex.border:hover {
+    background-image: none !important;
+    background: hsl(var(--accent-neon) / 0.15) !important;
+  }
+
+  /* Ensure proper text contrast in dark mode */
+  .dark .freelancer-card {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  .dark .freelancer-card .text-muted-foreground {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+}

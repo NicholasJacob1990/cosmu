@@ -22,3 +22,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Next.js build output
+.next/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Django database
+db.sqlite3

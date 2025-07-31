@@ -36,7 +36,7 @@ export function FreelancerCard({
   isVerified
 }: FreelancerCardProps) {
   return (
-    <Card className="group overflow-hidden hover:shadow-elegant transition-all duration-300 hover:-translate-y-1 bg-gradient-card border-0">
+    <Card className="freelancer-card group overflow-hidden hover:shadow-elegant transition-all duration-300 hover:-translate-y-1 bg-gradient-card border-0">
       <CardHeader className="p-6 pb-4">
         <div className="flex items-start gap-4">
           <div className="relative">
@@ -119,10 +119,10 @@ export function FreelancerCard({
             )}
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="galaxia-button-enhanced">
               <MessageCircle className="w-4 h-4" />
             </Button>
-            <Button variant="default" size="sm">
+            <Button variant="default" size="sm" className="galaxia-button-enhanced">
               Contratar
             </Button>
           </div>
