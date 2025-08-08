@@ -162,6 +162,107 @@ function SearchResultsContent() {
     setSortBy('relevance');
   };
 
+  const handleSearch = async () => {
+    if (!query.trim()) return;
+
+    setIsLoading(true);
+    try {
+      if (isAISearch) {
+        // Usar busca inteligente com IA
+        const params = new URLSearchParams({
+          q: query,
+          limit: '30'
+        });
+
+        if (selectedCategories.length > 0) {
+          params.append('category', selectedCategories[0]);
+        }
+        
+        if (priceRange[1] < 5000) {
+          params.append('price_max', priceRange[1].toString());
+        }
+
+        const response = await fetch(`/api/search/intelligent/?${params.toString()}`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('AI Search Results:', data);
+          // TODO: Atualizar estado com resultados reais da IA
+        } else {
+          console.error('Erro na busca IA:', response.status);
+        }
+      } else {
+        // Busca tradicional com Elasticsearch
+        await performElasticsearchSearch();
+      }
+    } catch (error) {
+      console.error('Erro na busca:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const performElasticsearchSearch = async () => {
+    const params = new URLSearchParams({
+      q: query,
+      limit: '30',
+      offset: '0'
+    });
+
+    // Aplicar filtros
+    if (selectedCategories.length > 0) {
+      params.append('category', selectedCategories[0]);
+    }
+    
+    if (priceRange[1] < 5000) {
+      params.append('price_max', priceRange[1].toString());
+    }
+
+    if (priceRange[0] > 0) {
+      params.append('price_min', priceRange[0].toString());
+    }
+
+    selectedSkills.forEach(skill => {
+      params.append('skills', skill);
+    });
+
+    if (sortBy !== 'relevance') {
+      params.append('sort_by', sortBy);
+    }
+
+    try {
+      let endpoint;
+      if (searchType === 'services') {
+        endpoint = `/api/search/elasticsearch/services/?${params.toString()}`;
+      } else {
+        endpoint = `/api/search/elasticsearch/freelancers/?${params.toString()}`;
+      }
+
+      const response = await fetch(endpoint);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Elasticsearch Results:', data);
+        
+        if (data.success && data.results) {
+          console.log(`✅ Elasticsearch: ${data.results.length} resultados encontrados em ${data.took}ms`);
+          console.log(`📊 Fonte: ${data.source}`);
+          console.log(`🔍 Query: "${data.query}"`);
+          
+          // Log de exemplo dos primeiros resultados
+          if (data.results.length > 0) {
+            console.log('🎯 Primeiros resultados:', data.results.slice(0, 3));
+          }
+        }
+      } else {
+        const errorData = await response.json();
+        console.error('❌ Erro na busca Elasticsearch:', response.status, errorData);
+      }
+    } catch (error) {
+      console.error('Erro na busca Elasticsearch:', error);
+    }
+  };
+
   const LoadingSkeleton = () => (
     <div className="space-y-4">
       {[...Array(6)].map((_, i) => (

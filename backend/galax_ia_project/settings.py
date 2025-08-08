@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -42,11 +43,13 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "django_filters",
     "corsheaders",
+    "channels",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     "allauth.socialaccount.providers.facebook",
+    # "django_elasticsearch_dsl",  # Temporariamente desabilitado para migração
     "api",
 ]
 
@@ -245,3 +248,229 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # EMAIL_USE_TLS = True
 # EMAIL_HOST_USER = 'your-email@gmail.com'
 # EMAIL_HOST_PASSWORD = 'your-app-password'
+
+# Celery Configuration
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'America/Sao_Paulo'
+
+# Celery Beat Schedule para tarefas periódicas
+CELERY_BEAT_SCHEDULE = {
+    'send-booking-reminders': {
+        'task': 'api.tasks.send_booking_reminder',
+        'schedule': 3600.0,  # Execute a cada hora
+    },
+    'clean-expired-time-slots': {
+        'task': 'api.tasks.clean_expired_time_slots',
+        'schedule': 86400.0,  # Execute diariamente
+    },
+    'auto-complete-past-bookings': {
+        'task': 'api.tasks.auto_complete_past_bookings',
+        'schedule': 1800.0,  # Execute a cada 30 minutos
+    },
+    'process-overdue-disputes': {
+        'task': 'api.tasks.process_overdue_disputes',
+        'schedule': 3600.0,  # Execute a cada hora
+    },
+    'escalate-disputes-to-mediation': {
+        'task': 'api.tasks.escalate_disputes_to_mediation',
+        'schedule': 14400.0,  # Execute a cada 4 horas
+    },
+    'reminder-dispute-deadline': {
+        'task': 'api.tasks.reminder_dispute_deadline',
+        'schedule': 21600.0,  # Execute a cada 6 horas
+    },
+}
+
+# Stripe Settings
+STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', 'pk_test_...')
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', 'sk_test_...')
+STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', 'whsec_...')
+
+# Frontend URL for redirects
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
+
+# AI Search System Settings
+AI_SEARCH_BASE_URL = os.environ.get('AI_SEARCH_BASE_URL', 'http://localhost:8001')
+AI_SEARCH_TIMEOUT = int(os.environ.get('AI_SEARCH_TIMEOUT', '5'))
+AI_SEARCH_ENABLED = os.environ.get('AI_SEARCH_ENABLED', 'True').lower() == 'true'
+
+# Django Channels Configuration
+ASGI_APPLICATION = 'galax_ia_project.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
+
+# Elasticsearch Configuration for Local Search
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': os.environ.get('ELASTICSEARCH_HOSTS', 'localhost:9200'),
+        'http_auth': (
+            os.environ.get('ELASTICSEARCH_USER'),
+            os.environ.get('ELASTICSEARCH_PASSWORD')
+        ) if os.environ.get('ELASTICSEARCH_USER') else None,
+        'timeout': 30,
+        'max_retries': 3,
+        'retry_on_timeout': True,
+    },
+}
+
+# Elasticsearch settings
+ELASTICSEARCH_INDEX_NAMES = {
+    'services': 'galax_services',
+    'freelancers': 'galax_freelancers',
+    'categories': 'galax_categories',
+}
+
+# Auto refresh after document changes (set to False in production)
+ELASTICSEARCH_DSL_AUTO_REFRESH = True
+
+# Pagination for indexing large datasets
+ELASTICSEARCH_DSL_QUERYSET_PAGINATION = 5000
+
+# ============================================================================
+# KYC (Know Your Customer) Configuration
+# ============================================================================
+
+# KYC Providers Configuration
+KYC_PROVIDERS = {
+    'unico': {
+        'api_key': os.getenv('UNICO_API_KEY', ''),
+        'endpoint': 'https://api.unico.com/v1/',
+        'webhook_secret': os.getenv('UNICO_WEBHOOK_SECRET', ''),
+        'enabled': os.getenv('UNICO_ENABLED', 'False').lower() == 'true'
+    },
+    'idwall': {
+        'api_key': os.getenv('IDWALL_API_KEY', ''),
+        'endpoint': 'https://api.idwall.co/v2/',
+        'webhook_secret': os.getenv('IDWALL_WEBHOOK_SECRET', ''),
+        'enabled': os.getenv('IDWALL_ENABLED', 'False').lower() == 'true'
+    },
+    'stripe': {
+        'api_key': os.getenv('STRIPE_SECRET_KEY', ''),
+        'endpoint': 'https://api.stripe.com/v1/',
+        'webhook_secret': os.getenv('STRIPE_IDENTITY_WEBHOOK_SECRET', ''),
+        'enabled': os.getenv('STRIPE_IDENTITY_ENABLED', 'False').lower() == 'true'
+    },
+    'serpro': {
+        'api_key': os.getenv('SERPRO_API_KEY', ''),
+        'endpoint': 'https://apigateway.serpro.gov.br/',
+        'enabled': os.getenv('SERPRO_ENABLED', 'False').lower() == 'true'
+    }
+}
+
+# File Storage for KYC Documents
+KYC_STORAGE_BACKEND = os.getenv('KYC_STORAGE_BACKEND', 'django.core.files.storage.FileSystemStorage')
+
+# AWS S3 Configuration (if using S3 for KYC documents)
+if KYC_STORAGE_BACKEND == 'storages.backends.s3boto3.S3Boto3Storage':
+    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_KYC_BUCKET_NAME', 'galaxia-kyc-documents')
+    AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'us-east-1')
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    AWS_DEFAULT_ACL = 'private'  # KYC documents should be private
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'max-age=86400',
+    }
+
+# KYC Security Settings
+KYC_MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+KYC_ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+KYC_ALLOWED_DOCUMENT_TYPES = ['application/pdf'] + KYC_ALLOWED_IMAGE_TYPES
+KYC_MAX_VERIFICATION_ATTEMPTS = 5
+KYC_VERIFICATION_TIMEOUT_DAYS = 30
+
+# Biometric Verification Settings
+BIOMETRIC_MAX_FILE_SIZE = 20 * 1024 * 1024  # 20MB for videos
+BIOMETRIC_ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime']
+BIOMETRIC_MIN_LIVENESS_SCORE = 0.85
+BIOMETRIC_MIN_QUALITY_SCORE = 0.7
+
+# Logging Configuration for KYC
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'kyc_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'kyc.log'),
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'api.services.kyc_service': {
+            'handlers': ['kyc_file', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'api.views_kyc': {
+            'handlers': ['kyc_file', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
+
+# Ensure logs directory exists
+os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
+
+# ============================================================================
+# Stripe Configuration - Sprint 3-4
+# ============================================================================
+
+# Stripe API Keys
+STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY', 'pk_test_...')
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', 'sk_test_...')
+STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET', 'whsec_...')
+
+# Stripe Connect Settings
+STRIPE_CONNECT_APPLICATION_FEE_PERCENT = 10.0  # 10% platform fee
+STRIPE_CONNECT_CLIENT_ID = os.getenv('STRIPE_CONNECT_CLIENT_ID', 'ca_...')
+
+# URLs para onboarding
+STRIPE_CONNECT_RETURN_URL = os.getenv('STRIPE_CONNECT_RETURN_URL', 'http://localhost:3000/dashboard')
+STRIPE_CONNECT_REFRESH_URL = os.getenv('STRIPE_CONNECT_REFRESH_URL', 'http://localhost:3000/onboarding')
+
+# Payment processing settings
+STRIPE_AUTO_CAPTURE_PAYMENTS = True
+STRIPE_PAYMENT_DESCRIPTION_TEMPLATE = "Pagamento GalaxIA - Projeto #{order_id}"
+
+# Webhook configuration
+STRIPE_WEBHOOK_TOLERANCE = 300  # 5 minutes tolerance for webhook timestamps
+
+# Currency and localization
+STRIPE_DEFAULT_CURRENCY = 'brl'
+STRIPE_LOCALE = 'pt-BR'
+
+# Connect account defaults
+STRIPE_CONNECT_ACCOUNT_DEFAULTS = {
+    'type': 'express',
+    'country': 'BR',
+    'business_type': 'individual',
+    'capabilities': {
+        'card_payments': {'requested': True},
+        'transfers': {'requested': True},
+    },
+    'settings': {
+        'payouts': {
+            'schedule': {
+                'interval': 'weekly',
+                'weekly_anchor': 'friday'
+            }
+        }
+    }
+}

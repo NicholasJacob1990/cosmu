@@ -17,14 +17,20 @@ export function Header() {
             <GalaxiaLogo />
           </Link>
           <nav className="hidden md:flex items-center gap-4 text-sm font-medium">
+            <Link href="/search" className="text-muted-foreground hover:text-foreground">
+              Busca Tradicional
+            </Link>
+            <Link href="/search/intelligent" className="text-muted-foreground hover:text-foreground">
+              Busca Inteligente IA
+            </Link>
             <Link href="/services" className="text-muted-foreground hover:text-foreground">
-              Buscar Serviços
+              Serviços
             </Link>
             <Link href="/freelancers" className="text-muted-foreground hover:text-foreground">
-              Encontrar Profissionais
+              Profissionais
             </Link>
             <Link href="/pricing" className="text-muted-foreground hover:text-foreground">
-              Nossos Planos
+              Planos
             </Link>
           </nav>
         </div>

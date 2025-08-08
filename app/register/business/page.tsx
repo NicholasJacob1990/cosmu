@@ -107,31 +107,55 @@ export default function BusinessRegistrationPage() {
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      // Preparar dados para registro
+      // Preparar dados para registro profissional
       const registrationData = {
         email: formData.email,
         password: formData.password,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        userType: "professional",
-        professionalType: "business",
-        entityType: entityType,
-        plan: "free", // Default to free plan
+        password_confirm: formData.password,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        professional_type: "business",
+        entity_type: entityType,
+        phone: formData.phone || '',
+        // Dados específicos do onboarding
+        company_name: formData.companyName || '',
+        cpf_cnpj: formData.cnpj || formData.cpf || '',
+        specialty: formData.specialty || '',
+        experience_years: formData.experienceYears || 0,
+        hourly_rate: formData.hourlyRate || 0,
+        service_description: formData.serviceDescription || '',
         ...formData
       };
 
-      console.log("Submitting registration data:", registrationData);
+      console.log("Submitting professional registration data:", registrationData);
       
-      // Aqui você faria a chamada para a API
-      // await authApi.register(registrationData);
+      // Usar API client para registro profissional
+      const { api } = await import('@/lib/api');
+      const response = await api.auth.registerProfessional(registrationData);
       
-      toast.success("Cadastro realizado com sucesso!");
+      if (response.error) {
+        throw new Error(response.error);
+      }
       
-      // Redirecionar para o dashboard de negócios
-      router.push("/dashboard/business");
+      // Salvar token de autenticação
+      if (response.data?.token) {
+        const { authToken } = await import('@/lib/api');
+        authToken.set(response.data.token);
+      }
+      
+      toast.success(response.data?.message || "Cadastro realizado com sucesso!");
+      
+      // Verificar se precisa completar onboarding
+      if (response.data?.onboarding_required) {
+        // Redirecionar para próxima etapa do onboarding
+        router.push(`/onboarding/step/${response.data.next_step}`);
+      } else {
+        // Redirecionar para o dashboard de negócios
+        router.push("/dashboard/business");
+      }
     } catch (error) {
       console.error("Registration error:", error);
-      toast.error("Erro ao realizar cadastro. Tente novamente.");
+      toast.error(error instanceof Error ? error.message : "Erro ao realizar cadastro. Tente novamente.");
     } finally {
       setIsLoading(false);
     }

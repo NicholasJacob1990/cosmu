@@ -11,13 +11,13 @@ from django.shortcuts import get_object_or_404
 import requests
 # Note: allauth imports will be added later when needed
 
-from .models import (
+from ..models import (
     User, FreelancerProfile, Category, ServicePackage,
     Project, Proposal, ServiceOrder, Order, Review,
     Message, Subscription, PlanFeature, FeatureUsage,
     AddOn, Transaction
 )
-from .serializers import (
+from ..serializers import (
     UserSerializer, LoginSerializer, FreelancerProfileSerializer,
     CategorySerializer, ServicePackageSerializer, ProjectSerializer,
     ProposalSerializer, ServiceOrderSerializer, OrderSerializer,
@@ -536,4 +536,186 @@ def resend_email_verification(request):
         return Response(
             {'error': 'Usuário não encontrado'}, 
             status=status.HTTP_404_NOT_FOUND
+        )
+
+
+# ========================= ELASTICSEARCH SEARCH VIEWS =========================
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def elasticsearch_search_services_view(request):
+    """
+    Busca tradicional de serviços usando Elasticsearch
+    """
+    try:
+        from .services.elasticsearch_service import ElasticsearchService
+        
+        # Parâmetros de busca
+        query = request.GET.get('q', '')
+        category = request.GET.get('category')
+        price_min = request.GET.get('price_min')
+        price_max = request.GET.get('price_max')
+        delivery_max_days = request.GET.get('delivery_max_days')
+        min_rating = request.GET.get('min_rating')
+        location = request.GET.get('location')
+        tags = request.GET.getlist('tags')
+        sort_by = request.GET.get('sort_by', 'relevance')
+        limit = int(request.GET.get('limit', 30))
+        offset = int(request.GET.get('offset', 0))
+        
+        # Converter parâmetros numéricos
+        price_min = float(price_min) if price_min else None
+        price_max = float(price_max) if price_max else None
+        delivery_max_days = int(delivery_max_days) if delivery_max_days else None
+        min_rating = float(min_rating) if min_rating else None
+        
+        # Executar busca
+        results = ElasticsearchService.search_services(
+            query=query,
+            category=category,
+            price_min=price_min,
+            price_max=price_max,
+            delivery_max_days=delivery_max_days,
+            min_rating=min_rating,
+            location=location,
+            tags=tags,
+            sort_by=sort_by,
+            limit=limit,
+            offset=offset
+        )
+        
+        return Response(results, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Erro na busca Elasticsearch: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def elasticsearch_search_freelancers_view(request):
+    """
+    Busca tradicional de freelancers usando Elasticsearch
+    """
+    try:
+        from .services.elasticsearch_service import ElasticsearchService
+        
+        # Parâmetros de busca
+        query = request.GET.get('q', '')
+        skills = request.GET.getlist('skills')
+        hourly_rate_min = request.GET.get('hourly_rate_min')
+        hourly_rate_max = request.GET.get('hourly_rate_max')
+        min_rating = request.GET.get('min_rating')
+        min_experience = request.GET.get('min_experience')
+        location = request.GET.get('location')
+        is_available = request.GET.get('is_available')
+        is_verified = request.GET.get('is_verified')
+        can_receive_payments = request.GET.get('can_receive_payments')
+        sort_by = request.GET.get('sort_by', 'relevance')
+        limit = int(request.GET.get('limit', 30))
+        offset = int(request.GET.get('offset', 0))
+        
+        # Converter parâmetros numéricos e booleanos
+        hourly_rate_min = float(hourly_rate_min) if hourly_rate_min else None
+        hourly_rate_max = float(hourly_rate_max) if hourly_rate_max else None
+        min_rating = float(min_rating) if min_rating else None
+        min_experience = int(min_experience) if min_experience else None
+        is_available = is_available.lower() == 'true' if is_available else None
+        is_verified = is_verified.lower() == 'true' if is_verified else None
+        can_receive_payments = can_receive_payments.lower() == 'true' if can_receive_payments else None
+        
+        # Executar busca
+        results = ElasticsearchService.search_freelancers(
+            query=query,
+            skills=skills,
+            hourly_rate_min=hourly_rate_min,
+            hourly_rate_max=hourly_rate_max,
+            min_rating=min_rating,
+            min_experience=min_experience,
+            location=location,
+            is_available=is_available,
+            is_verified=is_verified,
+            can_receive_payments=can_receive_payments,
+            sort_by=sort_by,
+            limit=limit,
+            offset=offset
+        )
+        
+        return Response(results, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Erro na busca Elasticsearch: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def elasticsearch_unified_search_view(request):
+    """
+    Busca unificada usando Elasticsearch (serviços + freelancers)
+    """
+    try:
+        from .services.elasticsearch_service import ElasticsearchService
+        
+        # Parâmetros de busca
+        query = request.GET.get('q', '')
+        content_types = request.GET.getlist('types')
+        limit = int(request.GET.get('limit', 30))
+        offset = int(request.GET.get('offset', 0))
+        
+        # Validar tipos de conteúdo
+        if content_types:
+            valid_types = ['service', 'freelancer']
+            content_types = [t for t in content_types if t in valid_types]
+        
+        # Executar busca
+        results = ElasticsearchService.unified_search(
+            query=query,
+            content_types=content_types,
+            limit=limit,
+            offset=offset
+        )
+        
+        return Response(results, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Erro na busca unificada: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def elasticsearch_aggregations_view(request):
+    """
+    Retorna agregações Elasticsearch para construir filtros dinâmicos
+    """
+    try:
+        from .services.elasticsearch_service import ElasticsearchService
+        
+        # Parâmetros
+        query = request.GET.get('q', '')
+        document_type = request.GET.get('type', 'service')  # 'service' ou 'freelancer'
+        
+        # Validar tipo
+        if document_type not in ['service', 'freelancer']:
+            document_type = 'service'
+        
+        # Executar agregações
+        results = ElasticsearchService.get_aggregations(
+            query=query,
+            document_type=document_type
+        )
+        
+        return Response(results, status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Erro nas agregações: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )

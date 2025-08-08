@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   LayoutGrid,
@@ -23,10 +23,12 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header"; 
 import { FiltersSidebar } from "@/components/services/FiltersSidebar";
 import { ServiceCard } from "@/components/services/ServiceCard";
+import { ServiceCardSkeleton } from "@/components/services/ServiceCardSkeleton";
 import { SortOptions } from "@/components/services/SortOptions";
 import { Pagination } from "@/components/ui/pagination";
 import { ComparisonBar } from "@/components/services/ComparisonBar";
 import { useRouter } from "next/navigation";
+import { api } from "@/lib/api";
 
 // Mock Data (simula uma chamada de API)
 const mockServices = Array.from({ length: 24 }, (_, i) => ({
@@ -52,8 +54,46 @@ export default function Services() {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  // Simulação de filtros (estado seria mais complexo com dados reais)
-  const [filters, setFilters] = useState({});
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filters, setFilters] = useState({
+    category: '',
+    priceRange: [0, 1000],
+    rating: 0,
+  });
+
+  // Hook para buscar serviços da API real
+  const { data: servicesData, isLoading, error, isFetching } = useQuery({
+    queryKey: ['services', searchQuery, filters],
+    queryFn: async () => {
+      try {
+        if (searchQuery?.trim()) {
+          return await api.services.search(searchQuery, filters);
+        } else {
+          return await api.services.list(filters);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar serviços:', error);
+        // Retornar mock data em caso de erro para desenvolvimento
+        return { data: mockServices };
+      }
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    gcTime: 10 * 60 * 1000, // 10 minutos
+    refetchOnWindowFocus: false,
+    enabled: true, // Sempre habilitado
+    placeholderData: { data: mockServices }, // Dados enquanto carrega
+    retry: (failureCount, error: any) => {
+      // Não retry para erros de client (4xx)
+      if (error?.status >= 400 && error?.status < 500) {
+        return false;
+      }
+      return failureCount < 2;
+    }
+  });
+
+  // Usar dados da API ou fallback para mock com validação
+  const services = (servicesData?.data?.results || servicesData?.data || mockServices || [])
+    .filter((service: any) => service && service.id); // Filtrar objetos inválidos
 
   const handleSelectService = (serviceId: string) => {
     setSelectedIds(prev => 
@@ -67,7 +107,7 @@ export default function Services() {
     router.push(`/compare?ids=${selectedIds.join(',')}`);
   };
 
-  const selectedServicesData = mockServices.filter(s => selectedIds.includes(s.id));
+  const selectedServicesData = services.filter((s: any) => selectedIds.includes(s.id));
 
   return (
     <div className="min-h-screen bg-background">
@@ -148,25 +188,46 @@ export default function Services() {
           <div className="flex-1">
             {/* Results Count */}
             <div className="mb-6 text-sm text-muted-foreground">
-              Mostrando {mockServices.length} serviços
+              {isLoading ? (
+                <div className="h-4 bg-muted rounded w-32 animate-pulse"></div>
+              ) : (
+                `Mostrando ${services.length} serviços`
+              )}
             </div>
 
             {/* Services Grid/List */}
-            <div className={
-              layout === "grid" 
-                ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" 
-                : "space-y-4"
-            }>
-              {mockServices.map((service) => (
-                <ServiceCard
-                  key={service.id}
-                  service={service}
-                  layout={layout}
-                  isSelected={selectedIds.includes(service.id)}
-                  onSelect={handleSelectService}
-                />
-              ))}
-            </div>
+            {isLoading ? (
+              <div className={
+                layout === "grid" 
+                  ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" 
+                  : "space-y-4"
+              }>
+                {[...Array(6)].map((_, i) => (
+                  <ServiceCardSkeleton key={i} layout={layout} />
+                ))}
+              </div>
+            ) : error ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground mb-4">Erro ao carregar serviços</p>
+                <Button onClick={() => window.location.reload()}>Tentar Novamente</Button>
+              </div>
+            ) : (
+              <div className={
+                layout === "grid" 
+                  ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" 
+                  : "space-y-4"
+              }>
+                {services.map((service: any) => (
+                  <ServiceCard
+                    key={service.id}
+                    service={service}
+                    layout={layout}
+                    isSelected={selectedIds.includes(service.id)}
+                    onSelect={handleSelectService}
+                  />
+                ))}
+              </div>
+            )}
 
             {/* Pagination */}
             <div className="mt-12 flex justify-center">
