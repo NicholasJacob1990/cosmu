@@ -1,34 +1,37 @@
-# Logs
-logs
+.DS_Store
+node_modules/
+.next/
+out/
+.vercel/
+.turbo/
+coverage/
+dist/
+build/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Next.js build output
-.next/
-
-# Python cache
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+marketplace_ai/.env
+venv/
 __pycache__/
-*.pyc
-
-# Django database
-db.sqlite3
+*.py[cod]
+*.class
+*.sqlite3
+backend/db.sqlite3
+.pytest_cache/
+.mypy_cache/
+.coverage
+*.egg-info/
+.idea/
+.vscode/
+.parcel-cache/
+.eslintcache
+.cache/
+.ruff_cache/

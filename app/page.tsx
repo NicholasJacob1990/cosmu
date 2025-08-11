@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import Link from "next/link";
 import { SearchToggle } from "@/components/SearchToggle";
 import { ServiceCard } from "@/components/ServiceCard";
 import { FreelancerCard } from "@/components/FreelancerCard";
@@ -24,7 +25,7 @@ import {
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { GalaxiaLogo } from "@/components/GalaxiaLogo";
-const heroProfessionalsImage = "/hero-professionals-bg.jpg";
+import heroProfessionalsImage from "@/assets/hero-professionals-bg.jpg";
 
 // Mock data for demonstration
 const mockServices = [
@@ -108,7 +109,7 @@ const mockFreelancers = [
   }
 ];
 
-export default function Index() {
+export default function HomePage() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searchMode, setSearchMode] = useState<'services' | 'freelancers'>('services');
 
@@ -125,15 +126,15 @@ export default function Index() {
           <GalaxiaLogo />
           
           <nav className="hidden md:flex items-center gap-6">
-            <a href="/services" className="text-sm font-medium text-galaxia-text-primary hover:text-galaxia-neon transition-colors duration-300">
+            <Link href="/services" className="text-sm font-medium text-galaxia-text-primary hover:text-galaxia-neon transition-colors duration-300">
               Encontrar Serviços
-            </a>
-            <a href="/freelancers" className="text-sm font-medium text-galaxia-text-primary hover:text-galaxia-neon transition-colors duration-300">
+            </Link>
+            <Link href="/freelancers" className="text-sm font-medium text-galaxia-text-primary hover:text-galaxia-neon transition-colors duration-300">
               Contratar Profissionais  
-            </a>
-            <a href="/pricing" className="text-sm font-medium text-galaxia-text-primary hover:text-galaxia-neon transition-colors duration-300">
+            </Link>
+            <Link href="/pricing" className="text-sm font-medium text-galaxia-text-primary hover:text-galaxia-neon transition-colors duration-300">
               Planos e Preços
-            </a>
+            </Link>
             <a href="#how-it-works" className="text-sm font-medium text-galaxia-text-primary hover:text-galaxia-neon transition-colors duration-300">
               Como Funciona
             </a>
@@ -141,31 +142,34 @@ export default function Index() {
 
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-galaxia-text-primary hover:text-galaxia-neon hover:bg-galaxia-surface"
-              onClick={() => window.location.href = '/login'}
-            >
-              Entrar
-            </Button>
-            <Button 
-              size="sm" 
-              className="flex items-center gap-2 bg-gradient-to-r from-galaxia-magenta to-galaxia-neon text-white hover:from-galaxia-neon hover:to-galaxia-magenta shadow-galaxia-glow transition-all duration-300"
-              onClick={() => window.location.href = '/register'}
-            >
-              <UserPlus className="h-4 w-4" />
-              Oferecer Serviços
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex items-center gap-2 border-galaxia-grad-b text-galaxia-grad-b hover:bg-galaxia-grad-b hover:text-white transition-all duration-300"
-              onClick={() => window.location.href = '/register'}
-            >
-              <Plus className="h-4 w-4" />
-              Cadastre-se
-            </Button>
+            <Link href="/login">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-galaxia-text-primary hover:text-galaxia-neon hover:bg-galaxia-surface"
+              >
+                Entrar
+              </Button>
+            </Link>
+            <Link href="/register">
+              <Button 
+                size="sm" 
+                className="flex items-center gap-2 bg-gradient-to-r from-galaxia-magenta to-galaxia-neon text-white hover:from-galaxia-neon hover:to-galaxia-magenta shadow-galaxia-glow transition-all duration-300"
+              >
+                <UserPlus className="h-4 w-4" />
+                Oferecer Serviços
+              </Button>
+            </Link>
+            <Link href="/register">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-2 border-galaxia-grad-b text-galaxia-grad-b hover:bg-galaxia-grad-b hover:text-white transition-all duration-300"
+              >
+                <Plus className="h-4 w-4" />
+                Cadastre-se
+              </Button>
+            </Link>
           </div>
         </div>
       </header>
@@ -181,6 +185,7 @@ export default function Index() {
           <div className="absolute top-1/2 right-1/3 w-1 h-1 bg-galaxia-grad-a rounded-full animate-star-twinkle opacity-30" style={{ animationDelay: '3s' }}></div>
         </div>
         
+        {/* Watermark Background */}
         <div className="absolute inset-0 opacity-2">
           <div 
             className="absolute inset-0 bg-cover bg-center animate-slow-zoom"
@@ -195,7 +200,7 @@ export default function Index() {
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="mb-6 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-gradient-to-r from-galaxia-grad-a via-galaxia-grad-b to-galaxia-grad-c text-white shadow-galaxia-glow animate-cosmic-pulse">
+            <div className="mb-6 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-gradient-to-r from-galaxia-grad-a via-galaxia-grad-b to-galaxia-grad-c border-0 text-white shadow-galaxia-glow animate-cosmic-pulse">
               <Sparkles className="w-4 h-4 mr-2" />
               Powered by AI
             </div>
@@ -214,12 +219,14 @@ export default function Index() {
 
             <SearchToggle onSearch={handleSearch} />
 
+            {/* Theme Demo */}
             <div className="mt-8 p-4 bg-galaxia-surface/50 rounded-lg border border-border/40">
               <p className="text-sm text-galaxia-text-muted text-center">
                 🌙 Clique no botão de tema no header para alternar entre modo claro e escuro
               </p>
             </div>
 
+            {/* Stats */}
             <div className="grid grid-cols-3 gap-8 mt-16 max-w-lg mx-auto">
               <div className="text-center">
                 <div className="text-2xl font-bold bg-gradient-to-r from-galaxia-grad-a to-galaxia-grad-c bg-clip-text text-transparent">50K+</div>
@@ -238,6 +245,7 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Search Mode Toggle */}
       <section className="py-12 border-b border-border/40">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center gap-4">
@@ -269,6 +277,7 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Categories */}
       <section className="py-16 bg-galaxia-surface/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -281,19 +290,21 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Results Section */}
       <section className="py-16 bg-galaxia-surface/20">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-galaxia-text-primary">
               {searchMode === 'services' ? 'Serviços em Destaque' : 'Profissionais Recomendados'}
             </h2>
-            <Button 
-              variant="outline" 
-              className="border-galaxia-grad-b text-galaxia-grad-b hover:bg-galaxia-grad-b hover:text-white transition-all duration-300"
-              onClick={() => window.location.href = searchMode === 'services' ? '/services' : '/freelancers'}
-            >
-              Ver Todos
-            </Button>
+            <Link href={searchMode === 'services' ? '/services' : '/freelancers'}>
+              <Button 
+                variant="outline" 
+                className="border-galaxia-grad-b text-galaxia-grad-b hover:bg-galaxia-grad-b hover:text-white transition-all duration-300"
+              >
+                Ver Todos
+              </Button>
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -311,6 +322,7 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Call to Action */}
       <section className="py-16 bg-gradient-to-br from-galaxia-grad-a/5 via-galaxia-grad-b/5 to-galaxia-grad-c/5">
         <div className="container mx-auto px-4">
           <div className="text-center">
@@ -320,29 +332,32 @@ export default function Index() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button 
-                size="lg"
-                className="bg-gradient-to-r from-galaxia-magenta to-galaxia-neon text-white hover:from-galaxia-neon hover:to-galaxia-magenta shadow-galaxia-glow transition-all duration-300"
-                onClick={() => window.location.href = '/register'}
-              >
-                <UserPlus className="h-5 w-5 mr-2" />
-                Oferecer Serviços
-              </Button>
+              <Link href="/register">
+                <Button 
+                  size="lg"
+                  className="bg-gradient-to-r from-galaxia-magenta to-galaxia-neon text-white hover:from-galaxia-neon hover:to-galaxia-magenta shadow-galaxia-glow transition-all duration-300"
+                >
+                  <UserPlus className="h-5 w-5 mr-2" />
+                  Oferecer Serviços
+                </Button>
+              </Link>
               
-              <Button 
-                size="lg"
-                variant="outline"
-                className="border-galaxia-grad-b text-galaxia-grad-b hover:bg-galaxia-grad-b hover:text-white transition-all duration-300"
-                onClick={() => window.location.href = '/services'}
-              >
-                <Users className="h-5 w-5 mr-2" />
-                Encontrar Profissionais
-              </Button>
+              <Link href="/services">
+                <Button 
+                  size="lg"
+                  variant="outline"
+                  className="border-galaxia-grad-b text-galaxia-grad-b hover:bg-galaxia-grad-b hover:text-white transition-all duration-300"
+                >
+                  <Users className="h-5 w-5 mr-2" />
+                  Encontrar Profissionais
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Pricing Preview */}
       <section className="py-16 bg-gradient-to-br from-galaxia-grad-a/10 via-galaxia-grad-b/10 to-galaxia-grad-c/10">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -353,6 +368,7 @@ export default function Index() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {/* Free Plan */}
             <div className="bg-white dark:bg-gray-900 rounded-xl border border-border/40 p-6 text-center">
               <div className="flex items-center justify-center gap-2 mb-4">
                 <Star className="h-5 w-5 text-gray-500" />
@@ -376,6 +392,7 @@ export default function Index() {
               </div>
             </div>
 
+            {/* Professional Plan */}
             <div className="bg-white dark:bg-gray-900 rounded-xl border-2 border-blue-300 p-6 text-center relative">
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                 <Badge className="bg-blue-500 text-white">Popular</Badge>
@@ -402,6 +419,7 @@ export default function Index() {
               </div>
             </div>
 
+            {/* Business Plan */}
             <div className="bg-white dark:bg-gray-900 rounded-xl border border-border/40 p-6 text-center">
               <div className="flex items-center justify-center gap-2 mb-4">
                 <Target className="h-5 w-5 text-purple-500" />
@@ -425,6 +443,7 @@ export default function Index() {
               </div>
             </div>
 
+            {/* Elite Plan */}
             <div className="bg-white dark:bg-gray-900 rounded-xl border border-border/40 p-6 text-center">
               <div className="flex items-center justify-center gap-2 mb-4">
                 <Rocket className="h-5 w-5 text-yellow-500" />
@@ -450,17 +469,19 @@ export default function Index() {
           </div>
 
           <div className="text-center mt-8">
-            <Button 
-              size="lg"
-              className="bg-gradient-to-r from-galaxia-magenta to-galaxia-neon text-white hover:from-galaxia-neon hover:to-galaxia-magenta shadow-galaxia-glow transition-all duration-300"
-              onClick={() => window.location.href = '/pricing'}
-            >
-              Ver Todos os Planos e Recursos
-            </Button>
+            <Link href="/pricing">
+              <Button 
+                size="lg"
+                className="bg-gradient-to-r from-galaxia-magenta to-galaxia-neon text-white hover:from-galaxia-neon hover:to-galaxia-magenta shadow-galaxia-glow transition-all duration-300"
+              >
+                Ver Todos os Planos e Recursos
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
 
+      {/* Features */}
       <section className="py-16 bg-galaxia-surface/10">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -504,6 +525,7 @@ export default function Index() {
         </div>
       </section>
 
+      {/* How It Works Section */}
       <section id="how-it-works" className="py-16 bg-gradient-to-br from-galaxia-grad-a/10 via-galaxia-grad-b/10 to-galaxia-grad-c/10">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -514,6 +536,7 @@ export default function Index() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+            {/* For Clients */}
             <div className="space-y-8">
               <h3 className="text-2xl font-semibold text-center text-galaxia-text-primary mb-8">Para Clientes</h3>
               
@@ -554,6 +577,7 @@ export default function Index() {
               </div>
             </div>
 
+            {/* For Professionals */}
             <div className="space-y-8">
               <h3 className="text-2xl font-semibold text-center text-galaxia-text-primary mb-8">Para Profissionais</h3>
               
@@ -596,17 +620,19 @@ export default function Index() {
           </div>
 
           <div className="text-center mt-12">
-            <Button 
-              size="lg" 
-              className="bg-gradient-to-r from-galaxia-magenta to-galaxia-neon text-white hover:from-galaxia-neon hover:to-galaxia-magenta shadow-galaxia-glow transition-all duration-300"
-              onClick={() => window.location.href = '/register'}
-            >
-              Comece Agora - É Grátis!
-            </Button>
+            <Link href="/register">
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-galaxia-magenta to-galaxia-neon text-white hover:from-galaxia-neon hover:to-galaxia-magenta shadow-galaxia-glow transition-all duration-300"
+              >
+                Comece Agora - É Grátis!
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
 
+      {/* Footer */}
       <Footer />
     </div>
   );

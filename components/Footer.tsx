@@ -1,225 +1,149 @@
-import Link from "next/link";
-import { 
-  Facebook, 
-  Twitter, 
-  Linkedin, 
+import Link from 'next/link';
+import { GalaxiaLogo } from '@/components/GalaxiaLogo';
+import {
+  Facebook,
+  Twitter,
   Instagram,
+  Linkedin,
   Youtube,
   Mail,
   Phone,
   MapPin,
-  ArrowRight
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
+} from 'lucide-react';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
+  const footerSections = [
+    {
+      title: 'Para Clientes',
+      links: [
+        { label: 'Como Funciona', href: '/how-it-works' },
+        { label: 'Encontrar Serviços', href: '/services' },
+        { label: 'Encontrar Profissionais', href: '/freelancers' },
+        { label: 'Publicar Projeto', href: '/create-project' },
+        { label: 'Central de Ajuda', href: '/help' },
+      ],
+    },
+    {
+      title: 'Para Profissionais',
+      links: [
+        { label: 'Começar a Vender', href: '/register/freelancer' },
+        { label: 'Como Vender', href: '/selling-guide' },
+        { label: 'Planos e Preços', href: '/pricing' },
+        { label: 'Academia GalaxIA', href: '/academy' },
+        { label: 'Recursos', href: '/resources' },
+      ],
+    },
+    {
+      title: 'Empresa',
+      links: [
+        { label: 'Sobre Nós', href: '/about' },
+        { label: 'Carreiras', href: '/careers' },
+        { label: 'Blog', href: '/blog' },
+        { label: 'Imprensa', href: '/press' },
+        { label: 'Contato', href: '/contact' },
+      ],
+    },
+    {
+      title: 'Legal',
+      links: [
+        { label: 'Termos de Uso', href: '/terms' },
+        { label: 'Política de Privacidade', href: '/privacy' },
+        { label: 'Cookies', href: '/cookies' },
+        { label: 'Propriedade Intelectual', href: '/ip-policy' },
+      ],
+    },
+  ];
+
+  const socialLinks = [
+    { Icon: Facebook, href: 'https://facebook.com', label: 'Facebook' },
+    { Icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
+    { Icon: Instagram, href: 'https://instagram.com', label: 'Instagram' },
+    { Icon: Linkedin, href: 'https://linkedin.com', label: 'LinkedIn' },
+    { Icon: Youtube, href: 'https://youtube.com', label: 'YouTube' },
+  ];
+
   return (
-    <footer className="bg-[#1a0033] text-gray-300 relative overflow-hidden">
-      {/* Background gradient effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-transparent to-blue-900/20" />
-      
-      <div className="relative">
-        {/* Newsletter Section */}
-        <div className="border-b border-gray-800">
-          <div className="container mx-auto px-4 py-12">
-            <div className="max-w-4xl mx-auto text-center space-y-4">
-              <h3 className="text-2xl font-bold text-white">
-                Fique por dentro das novidades
-              </h3>
-              <p className="text-gray-400">
-                Receba as melhores oportunidades e dicas para expandir seus negócios
-              </p>
-              <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-                <Input 
-                  type="email" 
-                  placeholder="Seu e-mail"
-                  className="bg-white/10 border-gray-700 text-white placeholder:text-gray-500 focus:border-purple-500"
-                />
-                <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
-                  Inscrever
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </form>
+    <footer className="bg-background border-t">
+      <div className="container mx-auto px-4 py-12">
+        {/* Top Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
+          {/* Brand Column */}
+          <div className="lg:col-span-1">
+            <GalaxiaLogo className="mb-4" />
+            <p className="text-sm text-muted-foreground mb-4">
+              Conectando talentos extraordinários com oportunidades ilimitadas.
+            </p>
+            
+            {/* Social Links */}
+            <div className="flex space-x-3">
+              {socialLinks.map(({ Icon, href, label }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                  aria-label={label}
+                >
+                  <Icon className="h-5 w-5" />
+                </a>
+              ))}
             </div>
           </div>
+
+          {/* Links Sections */}
+          {footerSections.map((section) => (
+            <div key={section.title}>
+              <h3 className="font-semibold mb-3">{section.title}</h3>
+              <ul className="space-y-2">
+                {section.links.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
-        {/* Main Footer Content */}
-        <div className="container mx-auto px-4 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
-            {/* Logo and Description */}
-            <div className="lg:col-span-2 space-y-6">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl font-bold text-white">GalaxIA</span>
-              </div>
-              <p className="text-gray-400 leading-relaxed">
-                A plataforma mais inteligente para conectar talentos e oportunidades. 
-                Transformamos a forma como profissionais e empresas se encontram através 
-                da inteligência artificial.
-              </p>
-              {/* Social Media */}
-              <div className="flex gap-3">
-                <a 
-                  href="#" 
-                  className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 transition-all duration-300"
-                  aria-label="Facebook"
-                >
-                  <Facebook className="h-5 w-5" />
-                </a>
-                <a 
-                  href="#" 
-                  className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 transition-all duration-300"
-                  aria-label="Twitter"
-                >
-                  <Twitter className="h-5 w-5" />
-                </a>
-                <a 
-                  href="#" 
-                  className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 transition-all duration-300"
-                  aria-label="LinkedIn"
-                >
-                  <Linkedin className="h-5 w-5" />
-                </a>
-                <a 
-                  href="#" 
-                  className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 transition-all duration-300"
-                  aria-label="Instagram"
-                >
-                  <Instagram className="h-5 w-5" />
-                </a>
-                <a 
-                  href="#" 
-                  className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 transition-all duration-300"
-                  aria-label="YouTube"
-                >
-                  <Youtube className="h-5 w-5" />
-                </a>
-              </div>
+        {/* Contact Info */}
+        <div className="border-t pt-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center space-x-2">
+              <Mail className="h-4 w-4" />
+              <span>contato@galaxia.com.br</span>
             </div>
-
-            {/* Para Clientes */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold text-white">Para Clientes</h4>
-              <ul className="space-y-3">
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
-                    Como Funciona
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
-                    Encontrar Freelancers
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
-                    Postar Projeto
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
-                    Categorias
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
-                    Planos Enterprise
-                  </Link>
-                </li>
-              </ul>
+            <div className="flex items-center space-x-2">
+              <Phone className="h-4 w-4" />
+              <span>0800 123 4567</span>
             </div>
-
-            {/* Para Freelancers */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold text-white">Para Freelancers</h4>
-              <ul className="space-y-3">
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
-                    Criar Perfil
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
-                    Encontrar Projetos
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
-                    Dicas de Sucesso
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
-                    Planos Premium
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
-                    Certificações
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Contato */}
-            <div className="space-y-4">
-              <h4 className="text-lg font-semibold text-white">Contato</h4>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-3">
-                  <Mail className="h-5 w-5 text-purple-400 mt-0.5" />
-                  <div>
-                    <p className="text-gray-400">contato@galaxia.ai</p>
-                    <p className="text-gray-400">suporte@galaxia.ai</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Phone className="h-5 w-5 text-purple-400 mt-0.5" />
-                  <div>
-                    <p className="text-gray-400">+55 (11) 4000-1234</p>
-                    <p className="text-gray-400">+55 (11) 94000-5678</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <MapPin className="h-5 w-5 text-purple-400 mt-0.5" />
-                  <div>
-                    <p className="text-gray-400">Av. Paulista, 1000</p>
-                    <p className="text-gray-400">São Paulo, SP - Brasil</p>
-                  </div>
-                </li>
-              </ul>
+            <div className="flex items-center space-x-2">
+              <MapPin className="h-4 w-4" />
+              <span>São Paulo, Brasil</span>
             </div>
           </div>
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-gray-800">
-          <div className="container mx-auto px-4 py-6">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm">
-                <Link href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
-                  Termos de Uso
-                </Link>
-                <Separator orientation="vertical" className="h-4 bg-gray-700" />
-                <Link href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
-                  Política de Privacidade
-                </Link>
-                <Separator orientation="vertical" className="h-4 bg-gray-700" />
-                <Link href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
-                  Central de Ajuda
-                </Link>
-                <Separator orientation="vertical" className="h-4 bg-gray-700" />
-                <Link href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
-                  Blog
-                </Link>
-              </div>
-              <p className="text-sm text-gray-500">
-                © {currentYear} GalaxIA. Todos os direitos reservados.
-              </p>
-            </div>
+        <div className="border-t pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
+          <p>&copy; {currentYear} GalaxIA. Todos os direitos reservados.</p>
+          <div className="flex items-center space-x-4 mt-4 md:mt-0">
+            <Link href="/terms" className="hover:text-primary transition-colors">
+              Termos
+            </Link>
+            <Link href="/privacy" className="hover:text-primary transition-colors">
+              Privacidade
+            </Link>
+            <Link href="/sitemap" className="hover:text-primary transition-colors">
+              Sitemap
+            </Link>
           </div>
         </div>
       </div>

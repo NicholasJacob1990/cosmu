@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,8 +12,6 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { ServiceCard } from "@/components/services/ServiceCard";
 import { Footer } from "@/components/Footer";
-import Image from "next/image";
-import Link from "next/link";
 import { 
   ArrowLeft,
   Star,
@@ -35,7 +34,7 @@ import {
   ExternalLink
 } from "lucide-react";
 
-// Mock data - em um app real, isso viria de uma API
+// Mock data
 const mockFreelancer = {
   id: "1",
   name: "Carlos Santos",
@@ -108,6 +107,14 @@ Já trabalhei com startups e grandes empresas, sempre focado em entregar código
       image: "/placeholder.svg",
       link: "https://example.com",
       tags: ["React", "TypeScript", "Charts"]
+    },
+    {
+      id: "3",
+      title: "Mobile App Backend",
+      description: "API REST para aplicativo mobile com 100k+ usuários",
+      image: "/placeholder.svg",
+      link: null,
+      tags: ["Node.js", "PostgreSQL", "AWS"]
     }
   ],
   
@@ -117,6 +124,12 @@ Já trabalhei com startups e grandes empresas, sempre focado em entregar código
       company: "Tech Startup XYZ",
       period: "2021 - Presente",
       description: "Liderando desenvolvimento de produtos SaaS"
+    },
+    {
+      title: "Full Stack Developer",
+      company: "Digital Agency ABC",
+      period: "2019 - 2021",
+      description: "Desenvolvimento de aplicações web para clientes diversos"
     }
   ],
   
@@ -132,39 +145,39 @@ Já trabalhei com startups e grandes empresas, sempre focado em entregar código
   availability: "Disponível para novos projetos"
 };
 
+// Mock services
 const mockServices = [
   {
-    id: 'service-1',
     title: "Desenvolvimento de Site Responsivo",
+    description: "Site profissional responsivo com React e Next.js",
     price: 2500,
     rating: 4.9,
-    reviews: 45,
+    reviewCount: 45,
     image: "/placeholder.svg",
-    professional: {
-      name: mockFreelancer.name,
-      avatarUrl: mockFreelancer.avatar,
-      level: mockFreelancer.isPro ? "Elite Pro" : "Top Rated"
-    }
+    tags: ["React", "Next.js", "Responsivo"],
+    deliveryTime: 14
   },
   {
-    id: 'service-2',
     title: "API REST com Node.js",
+    description: "API escalável com autenticação e documentação",
     price: 3500,
     rating: 5.0,
-    reviews: 23,
+    reviewCount: 23,
     image: "/placeholder.svg",
-    professional: {
-      name: mockFreelancer.name,
-      avatarUrl: mockFreelancer.avatar,
-      level: mockFreelancer.isPro ? "Elite Pro" : "Top Rated"
-    }
+    tags: ["Node.js", "MongoDB", "API"],
+    deliveryTime: 21
   }
 ];
 
+// Mock reviews
 const mockReviews = [
   {
     id: "1",
-    client: { name: "Maria Silva", avatar: "/placeholder.svg", country: "Brasil" },
+    client: {
+      name: "Maria Silva",
+      avatar: "/placeholder.svg",
+      country: "Brasil"
+    },
     rating: 5,
     comment: "Carlos é um profissional excepcional! Entregou o projeto antes do prazo com qualidade impecável. Super recomendo!",
     project: "E-commerce completo",
@@ -172,7 +185,11 @@ const mockReviews = [
   },
   {
     id: "2",
-    client: { name: "João Pereira", avatar: "/placeholder.svg", country: "Portugal" },
+    client: {
+      name: "João Pereira",
+      avatar: "/placeholder.svg",
+      country: "Portugal"
+    },
     rating: 5,
     comment: "Excelente comunicação e código muito bem estruturado. Foi um prazer trabalhar com o Carlos.",
     project: "Dashboard Analytics",
@@ -180,14 +197,17 @@ const mockReviews = [
   }
 ];
 
-export default function FreelancerProfilePage() {
-  const params = useParams();
+interface FreelancerProfileProps {
+  params: {
+    id: string;
+  };
+}
+
+export default function FreelancerProfile({ params }: FreelancerProfileProps) {
+  const { id } = params;
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("about");
   const [showVideo, setShowVideo] = useState(false);
-
-  // Em um app real, você usaria o `params.id` para buscar os dados do freelancer
-  const id = params.id;
 
   return (
     <div className="min-h-screen bg-background">
@@ -198,7 +218,6 @@ export default function FreelancerProfilePage() {
             variant="ghost"
             size="sm"
             onClick={() => router.back()}
-            className="text-galaxia-text-muted hover:text-galaxia-neon"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Voltar
@@ -207,19 +226,20 @@ export default function FreelancerProfilePage() {
       </header>
 
       {/* Cover Image */}
-      <div className="relative h-48 md:h-64 bg-gradient-to-r from-galaxia-grad-a/20 to-galaxia-grad-b/10">
-        <Image
-          src={mockFreelancer.coverImage}
-          alt="Cover"
-          fill
-          style={{ objectFit: 'cover' }}
-        />
+      <div className="relative h-48 md:h-64 bg-gradient-to-r from-primary/20 to-primary/10">
+        {mockFreelancer.coverImage && (
+          <img
+            src={mockFreelancer.coverImage}
+            alt="Cover"
+            className="w-full h-full object-cover"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
       </div>
 
       <div className="container mx-auto px-4 -mt-24 relative z-10">
         {/* Profile Header */}
-        <div className="bg-card rounded-lg p-6 mb-8 shadow-lg border-border/20">
+        <div className="bg-card rounded-lg p-6 mb-8 shadow-lg">
           <div className="flex flex-col md:flex-row gap-6">
             <Avatar className="h-32 w-32 border-4 border-background">
               <AvatarImage src={mockFreelancer.avatar} />
@@ -232,20 +252,20 @@ export default function FreelancerProfilePage() {
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <h1 className="text-2xl font-bold text-galaxia-text-primary">{mockFreelancer.name}</h1>
+                    <h1 className="text-2xl font-bold">{mockFreelancer.name}</h1>
                     {mockFreelancer.isVerified && (
-                      <CheckCircle className="h-5 w-5 text-galaxia-neon fill-galaxia-neon/20" />
+                      <CheckCircle className="h-5 w-5 text-blue-500" />
                     )}
                     {mockFreelancer.isPro && (
-                      <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+                      <Badge className="bg-gradient-to-r from-purple-600 to-pink-600">
                         PRO
                       </Badge>
                     )}
                   </div>
-                  <p className="text-lg text-galaxia-text-muted mb-3">
+                  <p className="text-lg text-muted-foreground mb-3">
                     {mockFreelancer.title}
                   </p>
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-galaxia-text-muted">
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <MapPin className="h-4 w-4" />
                       {mockFreelancer.location}
@@ -273,30 +293,41 @@ export default function FreelancerProfilePage() {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <Button size="lg" className="bg-gradient-to-r from-galaxia-magenta to-galaxia-neon text-white shadow-galaxia-glow">
+                <Button size="lg">
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Enviar Mensagem
                 </Button>
                 <Button size="lg" variant="outline">
                   Ver Serviços
                 </Button>
+                {showVideo && (
+                  <Button size="lg" variant="outline">
+                    <Play className="h-4 w-4 mr-2" />
+                    Ver Vídeo
+                  </Button>
+                )}
               </div>
             </div>
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-8 border-t border-border/20">
-            {Object.entries({
-              "Projetos Completos": mockFreelancer.stats.completedProjects,
-              "Taxa de Sucesso": `${mockFreelancer.stats.successRate}%`,
-              "Entregas no Prazo": `${mockFreelancer.stats.onTimeDelivery}%`,
-              "Clientes Recorrentes": `${mockFreelancer.stats.repeatClients}%`
-            }).map(([label, value]) => (
-              <div key={label} className="text-center">
-                <p className="text-2xl font-bold text-galaxia-text-primary">{value}</p>
-                <p className="text-sm text-galaxia-text-muted">{label}</p>
-              </div>
-            ))}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-8 border-t">
+            <div className="text-center">
+              <p className="text-2xl font-bold">{mockFreelancer.stats.completedProjects}</p>
+              <p className="text-sm text-muted-foreground">Projetos Completos</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold">{mockFreelancer.stats.successRate}%</p>
+              <p className="text-sm text-muted-foreground">Taxa de Sucesso</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold">{mockFreelancer.stats.onTimeDelivery}%</p>
+              <p className="text-sm text-muted-foreground">Entregas no Prazo</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold">{mockFreelancer.stats.repeatClients}%</p>
+              <p className="text-sm text-muted-foreground">Clientes Recorrentes</p>
+            </div>
           </div>
         </div>
 
@@ -312,51 +343,141 @@ export default function FreelancerProfilePage() {
               </TabsList>
 
               <TabsContent value="about" className="space-y-6 mt-6">
+                {/* Bio */}
                 <Card>
-                  <CardHeader><CardTitle>Sobre Mim</CardTitle></CardHeader>
+                  <CardHeader>
+                    <CardTitle>Sobre Mim</CardTitle>
+                  </CardHeader>
                   <CardContent>
-                    <div className="prose prose-sm dark:prose-invert max-w-none text-galaxia-text-muted">
-                      {mockFreelancer.bio.split('\n').map((p, i) => <p key={i}>{p}</p>)}
+                    <div className="prose prose-sm dark:prose-invert max-w-none">
+                      {mockFreelancer.bio.split('\n').map((paragraph, index) => (
+                        <p key={index}>{paragraph}</p>
+                      ))}
                     </div>
                   </CardContent>
                 </Card>
 
+                {/* Skills */}
                 <Card>
-                  <CardHeader><CardTitle>Habilidades</CardTitle></CardHeader>
+                  <CardHeader>
+                    <CardTitle>Habilidades</CardTitle>
+                  </CardHeader>
                   <CardContent className="space-y-4">
-                    {mockFreelancer.skills.map(s => (
-                      <div key={s.name}>
+                    {mockFreelancer.skills.map((skill) => (
+                      <div key={skill.name}>
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
-                            <span className="font-medium text-galaxia-text-primary">{s.name}</span>
-                            {s.verified && <CheckCircle className="h-4 w-4 text-galaxia-neon" />}
+                            <span className="font-medium">{skill.name}</span>
+                            {skill.verified && (
+                              <CheckCircle className="h-4 w-4 text-blue-500" />
+                            )}
                           </div>
-                          <span className="text-sm text-galaxia-text-muted">{s.level}%</span>
+                          <span className="text-sm text-muted-foreground">{skill.level}%</span>
                         </div>
-                        <Progress value={s.level} className="h-2" />
+                        <Progress value={skill.level} className="h-2" />
                       </div>
                     ))}
                   </CardContent>
                 </Card>
+
+                {/* Experience */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Experiência</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {mockFreelancer.experience.map((exp, index) => (
+                      <div key={index} className="flex gap-4">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2" />
+                        <div className="flex-1">
+                          <h4 className="font-semibold">{exp.title}</h4>
+                          <p className="text-sm text-muted-foreground">{exp.company}</p>
+                          <p className="text-sm text-muted-foreground">{exp.period}</p>
+                          <p className="text-sm mt-1">{exp.description}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+
+                {/* Education */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Educação</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {mockFreelancer.education.map((edu, index) => (
+                      <div key={index}>
+                        <h4 className="font-semibold">{edu.degree}</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {edu.institution} • {edu.year}
+                        </p>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+
+                {/* Certifications */}
+                {mockFreelancer.certifications.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Certificações</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {mockFreelancer.certifications.map((cert, index) => (
+                          <div key={index} className="flex items-start gap-3">
+                            <Award className="h-5 w-5 text-primary mt-0.5" />
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h4 className="font-semibold">{cert.name}</h4>
+                                {cert.verified && (
+                                  <CheckCircle className="h-4 w-4 text-blue-500" />
+                                )}
+                              </div>
+                              <p className="text-sm text-muted-foreground">
+                                {cert.issuer} • {cert.date}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </TabsContent>
 
-              <TabsContent value="portfolio" className="mt-6">
+              <TabsContent value="portfolio" className="space-y-6 mt-6">
                 <div className="grid md:grid-cols-2 gap-6">
-                  {mockFreelancer.portfolio.map(p => (
-                    <Card key={p.id} className="overflow-hidden">
-                      <div className="relative aspect-video">
-                        <Image src={p.image} alt={p.title} fill style={{ objectFit: 'cover' }} />
+                  {mockFreelancer.portfolio.map((project) => (
+                    <Card key={project.id} className="overflow-hidden">
+                      <div className="aspect-video bg-muted">
+                        <img
+                          src={project.image}
+                          alt={project.title}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                       <CardContent className="pt-4">
-                        <h3 className="font-semibold mb-2 text-galaxia-text-primary">{p.title}</h3>
-                        <p className="text-sm text-galaxia-text-muted mb-3">{p.description}</p>
+                        <h3 className="font-semibold mb-2">{project.title}</h3>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          {project.description}
+                        </p>
                         <div className="flex items-center justify-between">
                           <div className="flex flex-wrap gap-1">
-                            {p.tags.map(t => <Badge key={t} variant="secondary">{t}</Badge>)}
+                            {project.tags.map((tag) => (
+                              <Badge key={tag} variant="secondary" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
                           </div>
-                          {p.link && <Button variant="ghost" size="sm" asChild>
-                            <a href={p.link} target="_blank" rel="noopener noreferrer"><ExternalLink className="h-4 w-4" /></a>
-                          </Button>}
+                          {project.link && (
+                            <Button variant="ghost" size="sm" asChild>
+                              <a href={project.link} target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="h-4 w-4" />
+                              </a>
+                            </Button>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -364,38 +485,121 @@ export default function FreelancerProfilePage() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="services" className="mt-6">
+              <TabsContent value="services" className="space-y-6 mt-6">
                 <div className="grid md:grid-cols-2 gap-6">
-                  {mockServices.map((s, i) => <ServiceCard key={i} service={s} layout="grid" isSelected={false} onSelect={() => {}} />)}
+                  {mockServices.map((service, index) => (
+                    <ServiceCard
+                      key={index}
+                      {...service}
+                      provider={{
+                        name: mockFreelancer.name,
+                        avatar: mockFreelancer.avatar,
+                        level: mockFreelancer.isPro ? "Pro" : "Standard"
+                      }}
+                    />
+                  ))}
                 </div>
               </TabsContent>
 
-              <TabsContent value="reviews" className="mt-6">
+              <TabsContent value="reviews" className="space-y-6 mt-6">
                 <Card>
-                  <CardHeader><CardTitle>Avaliações ({mockFreelancer.stats.totalReviews})</CardTitle></CardHeader>
+                  <CardHeader>
+                    <CardTitle>Avaliações ({mockFreelancer.stats.totalReviews})</CardTitle>
+                  </CardHeader>
                   <CardContent>
-                    {mockReviews.map(r => (
-                      <div key={r.id} className="py-4 border-b border-border/20 last:border-b-0">
-                        <div className="flex items-start gap-4">
-                          <Avatar>
-                            <AvatarImage src={r.client.avatar} />
-                            <AvatarFallback>{r.client.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between mb-1">
-                              <div>
-                                <p className="font-medium text-galaxia-text-primary">{r.client.name}</p>
-                                <p className="text-sm text-galaxia-text-muted">{r.client.country} • {r.date}</p>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                {[...Array(5)].map((_, i) => <Star key={i} className={`h-4 w-4 ${i < r.rating ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`} />)}
-                              </div>
-                            </div>
-                            <p className="text-sm text-galaxia-text-muted">{r.comment}</p>
-                          </div>
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="text-center">
+                        <p className="text-4xl font-bold">{mockFreelancer.stats.avgRating}</p>
+                        <div className="flex items-center gap-1 mt-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`h-5 w-5 ${
+                                i < Math.floor(mockFreelancer.stats.avgRating)
+                                  ? 'fill-yellow-400 text-yellow-400'
+                                  : 'text-muted-foreground'
+                              }`}
+                            />
+                          ))}
                         </div>
                       </div>
-                    ))}
+                      <Separator orientation="vertical" className="h-16" />
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm">5 estrelas</span>
+                          <Progress value={85} className="flex-1 h-2" />
+                          <span className="text-sm text-muted-foreground">85%</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm">4 estrelas</span>
+                          <Progress value={10} className="flex-1 h-2" />
+                          <span className="text-sm text-muted-foreground">10%</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm">3 estrelas</span>
+                          <Progress value={3} className="flex-1 h-2" />
+                          <span className="text-sm text-muted-foreground">3%</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm">2 estrelas</span>
+                          <Progress value={1} className="flex-1 h-2" />
+                          <span className="text-sm text-muted-foreground">1%</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm">1 estrela</span>
+                          <Progress value={1} className="flex-1 h-2" />
+                          <span className="text-sm text-muted-foreground">1%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Separator className="my-6" />
+
+                    <div className="space-y-4">
+                      {mockReviews.map((review) => (
+                        <div key={review.id} className="space-y-3">
+                          <div className="flex items-start gap-4">
+                            <Avatar>
+                              <AvatarImage src={review.client.avatar} />
+                              <AvatarFallback>
+                                {review.client.name.split(' ').map(n => n[0]).join('')}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-1">
+                                <div>
+                                  <p className="font-medium">{review.client.name}</p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {review.client.country} • {review.date}
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  {[...Array(5)].map((_, i) => (
+                                    <Star
+                                      key={i}
+                                      className={`h-4 w-4 ${
+                                        i < review.rating
+                                          ? 'fill-yellow-400 text-yellow-400'
+                                          : 'text-muted-foreground'
+                                      }`}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                              <p className="text-sm">{review.comment}</p>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                Projeto: {review.project}
+                              </p>
+                            </div>
+                          </div>
+                          <Separator />
+                        </div>
+                      ))}
+                    </div>
+
+                    <Button variant="outline" className="w-full mt-6">
+                      Ver mais avaliações
+                    </Button>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -404,26 +608,50 @@ export default function FreelancerProfilePage() {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Availability Card */}
             <Card>
-              <CardHeader><CardTitle className="text-base">Disponibilidade</CardTitle></CardHeader>
+              <CardHeader>
+                <CardTitle className="text-base">Disponibilidade</CardTitle>
+              </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-                    <span className="text-sm font-medium text-galaxia-text-primary">{mockFreelancer.lastActive}</span>
+                    <span className="text-sm font-medium">{mockFreelancer.lastActive}</span>
                   </div>
                   <div className="space-y-2 text-sm">
-                    <p className="flex items-center gap-2"><Clock className="h-4 w-4 text-galaxia-text-muted" />{mockFreelancer.availability}</p>
-                    <p className="flex items-center gap-2"><DollarSign className="h-4 w-4 text-galaxia-text-muted" />R$ {mockFreelancer.hourlyRate}/hora</p>
-                    <p className="flex items-center gap-2"><Globe className="h-4 w-4 text-galaxia-text-muted" />{mockFreelancer.timezone}</p>
+                    <p className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      {mockFreelancer.availability}
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-muted-foreground" />
+                      R$ {mockFreelancer.hourlyRate}/hora
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <Globe className="h-4 w-4 text-muted-foreground" />
+                      {mockFreelancer.timezone}
+                    </p>
+                  </div>
+                  <Separator />
+                  <div>
+                    <p className="text-sm font-medium mb-2">Idiomas</p>
+                    <div className="flex flex-wrap gap-2">
+                      {mockFreelancer.languages.map((lang) => (
+                        <Badge key={lang} variant="secondary">
+                          {lang}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
+            {/* Contact Card */}
             <Card>
               <CardContent className="pt-6">
-                <Button className="w-full mb-3 bg-gradient-to-r from-galaxia-magenta to-galaxia-neon text-white shadow-galaxia-glow">
+                <Button className="w-full mb-3">
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Enviar Mensagem
                 </Button>
@@ -431,6 +659,64 @@ export default function FreelancerProfilePage() {
                   <FileText className="h-4 w-4 mr-2" />
                   Solicitar Orçamento
                 </Button>
+              </CardContent>
+            </Card>
+
+            {/* Trust Badges */}
+            <Card>
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <div>
+                      <p className="font-medium text-sm">Identidade Verificada</p>
+                      <p className="text-xs text-muted-foreground">
+                        Documento confirmado
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Zap className="h-5 w-5 text-blue-500" />
+                    <div>
+                      <p className="font-medium text-sm">Resposta Rápida</p>
+                      <p className="text-xs text-muted-foreground">
+                        {mockFreelancer.responseTime}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <TrendingUp className="h-5 w-5 text-purple-500" />
+                    <div>
+                      <p className="font-medium text-sm">Top Performer</p>
+                      <p className="text-xs text-muted-foreground">
+                        {mockFreelancer.stats.successRate}% taxa de sucesso
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Member Info */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Informações do Membro</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Membro desde</span>
+                    <span>{mockFreelancer.memberSince}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Total ganho</span>
+                    <span>R$ {mockFreelancer.stats.totalEarnings.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Projetos completos</span>
+                    <span>{mockFreelancer.stats.completedProjects}</span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>

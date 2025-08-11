@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { Eye, EyeOff, Mail, Lock, ArrowLeft } from "lucide-react";
 import { GalaxiaLogo } from "@/components/GalaxiaLogo";
 
-export default function Login() {
+export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,7 +28,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8000/api/auth/login", {
+      const response = await fetch("http://localhost:3001/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -46,12 +46,10 @@ export default function Login() {
         throw new Error(data.error || "Erro ao fazer login");
       }
 
-      // Store auth data (only on client)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem("user", JSON.stringify(data.user));
-        if (data.token) {
-          localStorage.setItem("token", data.token);
-        }
+      // Store auth data
+      localStorage.setItem("user", JSON.stringify(data.user));
+      if (data.token) {
+        localStorage.setItem("token", data.token);
       }
 
       toast.success("Login realizado com sucesso!");

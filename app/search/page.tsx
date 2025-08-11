@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import { ServiceCard } from "@/components/services/ServiceCard";
+import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { ServiceCard } from "@/components/ServiceCard";
 import { FreelancerCard } from "@/components/FreelancerCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,21 +44,7 @@ const mockFreelancers = [
     isOnline: true,
     isVerified: true
   },
-  {
-    name: "Carla Santos",
-    title: "Designer UI/UX",
-    description: "Criação de interfaces modernas e experiências digitais memoráveis. Portfolio com 100+ projetos.",
-    hourlyRate: 65,
-    rating: 4.8,
-    reviewCount: 89,
-    completedJobs: 67,
-    responseTime: "1 hora",
-    location: "Rio de Janeiro, RJ",
-    avatar: "/placeholder.svg",
-    skills: ["Figma", "Sketch", "Adobe XD", "Prototyping", "User Research"],
-    isOnline: false,
-    isVerified: true
-  }
+  // Add more mock data as needed
 ];
 
 const mockServices = [
@@ -77,29 +63,16 @@ const mockServices = [
     tags: ["Logo", "Branding", "Design"],
     isFavorite: false
   },
-  {
-    title: "Desenvolvimento de Website Responsivo",
-    description: "Site completo com design moderno, otimizado para SEO e totalmente responsivo.",
-    price: 1299,
-    rating: 4.7,
-    reviewCount: 89,
-    provider: {
-      name: "Bruno Oliveira",
-      avatar: "/placeholder.svg",
-      level: "Expert"
-    },
-    image: "/placeholder.svg",
-    tags: ["Website", "React", "Desenvolvimento"],
-    isFavorite: false
-  }
+  // Add more mock data as needed
 ];
 
-function SearchResultsContent() {
+export default function SearchResults() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [searchType, setSearchType] = useState<'services' | 'freelancers'>(
-    (searchParams?.get('mode') as 'services' | 'freelancers') || 'services'
+    (searchParams.get('mode') as 'services' | 'freelancers') || 'services'
   );
-  const [query, setQuery] = useState(searchParams?.get('q') || '');
+  const [query, setQuery] = useState(searchParams.get('q') || '');
   const [priceRange, setPriceRange] = useState([0, 5000]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
@@ -108,7 +81,7 @@ function SearchResultsContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   
-  const searchMode = searchParams?.get('type') || 'traditional';
+  const searchMode = searchParams.get('type') || 'traditional';
   const isAISearch = searchMode === 'ai';
 
   useEffect(() => {
@@ -117,244 +90,92 @@ function SearchResultsContent() {
     setTimeout(() => setIsLoading(false), 1000);
   }, [searchParams]);
 
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    params.set('q', query);
+    params.set('type', searchMode);
+    params.set('mode', searchType);
+    router.push(`/search?${params.toString()}`);
+  };
+
   const categories = [
     "Desenvolvimento",
     "Design",
     "Marketing",
     "Redação",
-    "Consultoria",
-    "Tradução",
-    "Vídeo & Áudio",
-    "Saúde"
+    "Vídeo",
+    "Tradução"
   ];
 
   const skills = [
-    "React",
-    "Node.js",
-    "Python",
-    "Figma",
-    "Photoshop",
-    "SEO",
-    "WordPress",
-    "MongoDB"
+    "React", "Node.js", "Python", "JavaScript", "TypeScript",
+    "Figma", "Photoshop", "WordPress", "SEO", "Google Ads"
   ];
-
-  const handleCategoryChange = (category: string, checked: boolean) => {
-    if (checked) {
-      setSelectedCategories(prev => [...prev, category]);
-    } else {
-      setSelectedCategories(prev => prev.filter(c => c !== category));
-    }
-  };
-
-  const handleSkillChange = (skill: string, checked: boolean) => {
-    if (checked) {
-      setSelectedSkills(prev => [...prev, skill]);
-    } else {
-      setSelectedSkills(prev => prev.filter(s => s !== skill));
-    }
-  };
-
-  const clearFilters = () => {
-    setSelectedCategories([]);
-    setSelectedSkills([]);
-    setPriceRange([0, 5000]);
-    setSortBy('relevance');
-  };
-
-  const handleSearch = async () => {
-    if (!query.trim()) return;
-
-    setIsLoading(true);
-    try {
-      if (isAISearch) {
-        // Usar busca inteligente com IA
-        const params = new URLSearchParams({
-          q: query,
-          limit: '30'
-        });
-
-        if (selectedCategories.length > 0) {
-          params.append('category', selectedCategories[0]);
-        }
-        
-        if (priceRange[1] < 5000) {
-          params.append('price_max', priceRange[1].toString());
-        }
-
-        const response = await fetch(`/api/search/intelligent/?${params.toString()}`);
-        
-        if (response.ok) {
-          const data = await response.json();
-          console.log('AI Search Results:', data);
-          // TODO: Atualizar estado com resultados reais da IA
-        } else {
-          console.error('Erro na busca IA:', response.status);
-        }
-      } else {
-        // Busca tradicional com Elasticsearch
-        await performElasticsearchSearch();
-      }
-    } catch (error) {
-      console.error('Erro na busca:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const performElasticsearchSearch = async () => {
-    const params = new URLSearchParams({
-      q: query,
-      limit: '30',
-      offset: '0'
-    });
-
-    // Aplicar filtros
-    if (selectedCategories.length > 0) {
-      params.append('category', selectedCategories[0]);
-    }
-    
-    if (priceRange[1] < 5000) {
-      params.append('price_max', priceRange[1].toString());
-    }
-
-    if (priceRange[0] > 0) {
-      params.append('price_min', priceRange[0].toString());
-    }
-
-    selectedSkills.forEach(skill => {
-      params.append('skills', skill);
-    });
-
-    if (sortBy !== 'relevance') {
-      params.append('sort_by', sortBy);
-    }
-
-    try {
-      let endpoint;
-      if (searchType === 'services') {
-        endpoint = `/api/search/elasticsearch/services/?${params.toString()}`;
-      } else {
-        endpoint = `/api/search/elasticsearch/freelancers/?${params.toString()}`;
-      }
-
-      const response = await fetch(endpoint);
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Elasticsearch Results:', data);
-        
-        if (data.success && data.results) {
-          console.log(`✅ Elasticsearch: ${data.results.length} resultados encontrados em ${data.took}ms`);
-          console.log(`📊 Fonte: ${data.source}`);
-          console.log(`🔍 Query: "${data.query}"`);
-          
-          // Log de exemplo dos primeiros resultados
-          if (data.results.length > 0) {
-            console.log('🎯 Primeiros resultados:', data.results.slice(0, 3));
-          }
-        }
-      } else {
-        const errorData = await response.json();
-        console.error('❌ Erro na busca Elasticsearch:', response.status, errorData);
-      }
-    } catch (error) {
-      console.error('Erro na busca Elasticsearch:', error);
-    }
-  };
-
-  const LoadingSkeleton = () => (
-    <div className="space-y-4">
-      {[...Array(6)].map((_, i) => (
-        <Card key={i} className="p-4">
-          <div className="flex space-x-4">
-            <Skeleton className="h-16 w-16 rounded-lg" />
-            <div className="flex-1 space-y-2">
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-3 w-1/2" />
-              <Skeleton className="h-3 w-2/3" />
-            </div>
-          </div>
-        </Card>
-      ))}
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Search Header */}
-      <div className="border-b border-border/40 bg-background/95 backdrop-blur sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Buscar serviços ou profissionais..."
-                className="pl-10 h-12"
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              />
-            </div>
-            <Button onClick={handleSearch} size="lg">
-              {isAISearch && <Sparkles className="mr-2 h-4 w-4" />}
-              Buscar
-            </Button>
-          </div>
-
-          {/* Search Type Toggle */}
+      {/* Header */}
+      <header className="border-b sticky top-0 z-40 bg-background/95 backdrop-blur">
+        <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
-            <div className="flex bg-muted rounded-lg p-1">
+            <div className="flex-1 max-w-2xl">
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    placeholder="Buscar serviços ou freelancers..."
+                    className="pl-10"
+                  />
+                </div>
+                <Button onClick={handleSearch}>
+                  Buscar
+                </Button>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
               <Button
-                variant={searchType === 'services' ? 'default' : 'ghost'}
-                size="sm"
+                variant={searchType === 'services' ? 'default' : 'outline'}
                 onClick={() => setSearchType('services')}
-                className="flex items-center gap-2"
+                size="sm"
               >
-                <Package className="h-4 w-4" />
+                <Package className="h-4 w-4 mr-2" />
                 Serviços
               </Button>
               <Button
-                variant={searchType === 'freelancers' ? 'default' : 'ghost'}
-                size="sm"
+                variant={searchType === 'freelancers' ? 'default' : 'outline'}
                 onClick={() => setSearchType('freelancers')}
-                className="flex items-center gap-2"
+                size="sm"
               >
-                <Users className="h-4 w-4" />
+                <Users className="h-4 w-4 mr-2" />
                 Freelancers
               </Button>
             </div>
 
             <Button
               variant="outline"
-              size="sm"
+              size="icon"
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2"
             >
               <SlidersHorizontal className="h-4 w-4" />
-              Filtros
             </Button>
-
-            {isAISearch && (
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <Sparkles className="h-3 w-3" />
-                Busca Inteligente
-              </Badge>
-            )}
           </div>
         </div>
-      </div>
+      </header>
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex gap-8">
           {/* Filters Sidebar */}
           {showFilters && (
-            <div className="w-80 space-y-6">
+            <aside className="w-80 shrink-0">
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                  <CardTitle className="text-lg">Filtros</CardTitle>
-                  <Button variant="ghost" size="sm" onClick={clearFilters}>
-                    <X className="h-4 w-4" />
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle>Filtros</CardTitle>
+                  <Button variant="ghost" size="sm">
+                    Limpar
                   </Button>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -366,9 +187,9 @@ function SearchResultsContent() {
                       onValueChange={setPriceRange}
                       max={5000}
                       step={50}
-                      className="w-full"
+                      className="mt-2"
                     />
-                    <div className="flex justify-between text-sm text-muted-foreground">
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
                       <span>R$ {priceRange[0]}</span>
                       <span>R$ {priceRange[1]}</span>
                     </div>
@@ -379,22 +200,26 @@ function SearchResultsContent() {
                   {/* Categories */}
                   <div className="space-y-3">
                     <Label>Categorias</Label>
-                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                    <div className="space-y-2">
                       {categories.map((category) => (
                         <div key={category} className="flex items-center space-x-2">
                           <Checkbox
                             id={category}
                             checked={selectedCategories.includes(category)}
-                            onCheckedChange={(checked) => 
-                              handleCategoryChange(category, checked as boolean)
-                            }
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedCategories([...selectedCategories, category]);
+                              } else {
+                                setSelectedCategories(selectedCategories.filter(c => c !== category));
+                              }
+                            }}
                           />
-                          <Label
+                          <label
                             htmlFor={category}
-                            className="text-sm font-normal cursor-pointer"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                           >
                             {category}
-                          </Label>
+                          </label>
                         </div>
                       ))}
                     </div>
@@ -403,143 +228,156 @@ function SearchResultsContent() {
                   <Separator />
 
                   {/* Skills */}
-                  {searchType === 'freelancers' && (
-                    <div className="space-y-3">
-                      <Label>Habilidades</Label>
-                      <div className="space-y-2 max-h-48 overflow-y-auto">
-                        {skills.map((skill) => (
-                          <div key={skill} className="flex items-center space-x-2">
-                            <Checkbox
-                              id={skill}
-                              checked={selectedSkills.includes(skill)}
-                              onCheckedChange={(checked) => 
-                                handleSkillChange(skill, checked as boolean)
-                              }
-                            />
-                            <Label
-                              htmlFor={skill}
-                              className="text-sm font-normal cursor-pointer"
-                            >
-                              {skill}
-                            </Label>
-                          </div>
-                        ))}
-                      </div>
+                  <div className="space-y-3">
+                    <Label>Habilidades</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {skills.map((skill) => (
+                        <Badge
+                          key={skill}
+                          variant={selectedSkills.includes(skill) ? "default" : "outline"}
+                          className="cursor-pointer"
+                          onClick={() => {
+                            if (selectedSkills.includes(skill)) {
+                              setSelectedSkills(selectedSkills.filter(s => s !== skill));
+                            } else {
+                              setSelectedSkills([...selectedSkills, skill]);
+                            }
+                          }}
+                        >
+                          {skill}
+                        </Badge>
+                      ))}
                     </div>
-                  )}
+                  </div>
+
+                  <Separator />
+
+                  {/* Sort */}
+                  <div className="space-y-3">
+                    <Label>Ordenar por</Label>
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="relevance">Relevância</SelectItem>
+                        <SelectItem value="price_low">Menor Preço</SelectItem>
+                        <SelectItem value="price_high">Maior Preço</SelectItem>
+                        <SelectItem value="rating">Melhor Avaliação</SelectItem>
+                        <SelectItem value="newest">Mais Recente</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </CardContent>
               </Card>
-            </div>
+            </aside>
           )}
 
           {/* Results */}
           <div className="flex-1">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h1 className="text-2xl font-bold mb-2">
-                  {query ? `Resultados para "${query}"` : 'Todos os resultados'}
-                </h1>
-                <p className="text-muted-foreground">
-                  {searchType === 'services' ? mockServices.length : mockFreelancers.length} {searchType === 'services' ? 'serviços' : 'freelancers'} encontrados
-                </p>
+            {/* Results Header */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-2xl font-bold">
+                    {isAISearch && (
+                      <Badge variant="secondary" className="mr-2">
+                        <Sparkles className="h-3 w-3 mr-1" />
+                        IA
+                      </Badge>
+                    )}
+                    Resultados para "{searchParams.get('q')}"
+                  </h1>
+                  <p className="text-muted-foreground mt-1">
+                    {searchType === 'services' ? '24 serviços encontrados' : '18 freelancers encontrados'}
+                  </p>
+                </div>
               </div>
 
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-48">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="relevance">Mais Relevantes</SelectItem>
-                  <SelectItem value="rating">Melhor Avaliados</SelectItem>
-                  <SelectItem value="price-low">Menor Preço</SelectItem>
-                  <SelectItem value="price-high">Maior Preço</SelectItem>
-                  <SelectItem value="newest">Mais Recentes</SelectItem>
-                </SelectContent>
-              </Select>
+              {isAISearch && (
+                <Card className="mt-4 border-purple-200 bg-purple-50/50 dark:border-purple-800 dark:bg-purple-950/20">
+                  <CardContent className="pt-6">
+                    <div className="flex gap-3">
+                      <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400 mt-0.5" />
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">Análise da IA:</p>
+                        <p className="text-sm text-muted-foreground">
+                          Com base na sua busca, identificamos profissionais especializados em desenvolvimento web 
+                          com React e Node.js, com experiência comprovada em projetos similares. 
+                          Os resultados foram ordenados por compatibilidade com suas necessidades.
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
-
-            {/* Active Filters */}
-            {(selectedCategories.length > 0 || selectedSkills.length > 0) && (
-              <div className="flex items-center gap-2 mb-6 flex-wrap">
-                <span className="text-sm text-muted-foreground">Filtros ativos:</span>
-                {selectedCategories.map((category) => (
-                  <Badge key={category} variant="secondary" className="flex items-center gap-1">
-                    {category}
-                    <X 
-                      className="h-3 w-3 cursor-pointer" 
-                      onClick={() => handleCategoryChange(category, false)}
-                    />
-                  </Badge>
-                ))}
-                {selectedSkills.map((skill) => (
-                  <Badge key={skill} variant="secondary" className="flex items-center gap-1">
-                    {skill}
-                    <X 
-                      className="h-3 w-3 cursor-pointer" 
-                      onClick={() => handleSkillChange(skill, false)}
-                    />
-                  </Badge>
-                ))}
-              </div>
-            )}
 
             {/* Results Grid */}
             {isLoading ? (
-              <LoadingSkeleton />
-            ) : (
-              <div className="space-y-6">
-                {searchType === 'services' ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {mockServices.map((service, index) => (
-                      <ServiceCard key={index} {...service} />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {mockFreelancers.map((freelancer, index) => (
-                      <FreelancerCard key={index} {...freelancer} />
-                    ))}
-                  </div>
-                )}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <Card key={i}>
+                    <CardContent className="p-6">
+                      <Skeleton className="h-40 w-full mb-4" />
+                      <Skeleton className="h-4 w-3/4 mb-2" />
+                      <Skeleton className="h-3 w-full mb-2" />
+                      <Skeleton className="h-3 w-full mb-4" />
+                      <Skeleton className="h-8 w-20" />
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-            )}
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {searchType === 'services' 
+                    ? mockServices.map((service, index) => (
+                        <ServiceCard key={index} {...service} />
+                      ))
+                    : mockFreelancers.map((freelancer, index) => (
+                        <FreelancerCard key={index} {...freelancer} />
+                      ))
+                  }
+                </div>
 
-            {/* Pagination */}
-            <div className="flex items-center justify-center gap-2 mt-8">
-              <Button variant="outline" size="sm" disabled={currentPage === 1}>
-                <ChevronLeft className="h-4 w-4" />
-                Anterior
-              </Button>
-              
-              {[1, 2, 3, 4, 5].map((page) => (
-                <Button
-                  key={page}
-                  variant={currentPage === page ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setCurrentPage(page)}
-                >
-                  {page}
-                </Button>
-              ))}
-              
-              <Button variant="outline" size="sm">
-                Próximo
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
+                {/* Pagination */}
+                <div className="mt-8 flex items-center justify-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  
+                  {[1, 2, 3, 4, 5].map((page) => (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </Button>
+                  ))}
+                  
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
 
       <Footer />
     </div>
-  );
-}
-
-export default function SearchResultsPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <SearchResultsContent />
-    </Suspense>
   );
 }

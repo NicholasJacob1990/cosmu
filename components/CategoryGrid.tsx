@@ -1,137 +1,193 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Code, 
-  Palette, 
-  PenTool, 
-  Camera, 
-  Music, 
-  Globe, 
-  Megaphone, 
-  BarChart,
-  FileText,
+import Link from 'next/link';
+import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import {
+  Code,
+  Palette,
+  PenTool,
+  Camera,
   Video,
+  Music,
+  Megaphone,
+  TrendingUp,
+  Globe,
   Smartphone,
-  Briefcase
-} from "lucide-react";
+  Database,
+  Shield,
+  Calculator,
+  BookOpen,
+  Languages,
+  Headphones,
+} from 'lucide-react';
 
-const categories = [
+interface Category {
+  name: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  href: string;
+  serviceCount: number;
+  gradient: string;
+  popular?: boolean;
+}
+
+const categories: Category[] = [
   {
-    name: "Desenvolvimento",
+    name: 'Desenvolvimento',
+    description: 'Websites, apps e sistemas',
     icon: Code,
-    count: 1245,
-    gradient: "from-blue-500 to-cyan-500",
-    popular: true
+    href: '/services?category=desenvolvimento',
+    serviceCount: 2847,
+    gradient: 'from-blue-500 to-cyan-500',
+    popular: true,
   },
   {
-    name: "Design & Arte",
+    name: 'Design & Arte',
+    description: 'Logos, UI/UX e design gráfico',
     icon: Palette,
-    count: 892,
-    gradient: "from-purple-500 to-pink-500",
-    popular: true
+    href: '/services?category=design',
+    serviceCount: 1923,
+    gradient: 'from-purple-500 to-pink-500',
+    popular: true,
   },
   {
-    name: "Redação",
+    name: 'Redação',
+    description: 'Conteúdo, copywriting e tradução',
     icon: PenTool,
-    count: 567,
-    gradient: "from-green-500 to-emerald-500",
-    popular: false
+    href: '/services?category=redacao',
+    serviceCount: 1456,
+    gradient: 'from-green-500 to-emerald-500',
   },
   {
-    name: "Fotografia",
+    name: 'Fotografia',
+    description: 'Fotos profissionais e edição',
     icon: Camera,
-    count: 234,
-    gradient: "from-orange-500 to-red-500",
-    popular: false
+    href: '/services?category=fotografia',
+    serviceCount: 892,
+    gradient: 'from-yellow-500 to-orange-500',
   },
   {
-    name: "Música & Áudio",
-    icon: Music,
-    count: 345,
-    gradient: "from-indigo-500 to-purple-500",
-    popular: false
-  },
-  {
-    name: "Web & Mobile",
-    icon: Globe,
-    count: 678,
-    gradient: "from-teal-500 to-blue-500",
-    popular: true
-  },
-  {
-    name: "Marketing",
-    icon: Megaphone,
-    count: 456,
-    gradient: "from-yellow-500 to-orange-500",
-    popular: false
-  },
-  {
-    name: "Dados & Analytics",
-    icon: BarChart,
-    count: 123,
-    gradient: "from-gray-500 to-slate-500",
-    popular: false
-  },
-  {
-    name: "Tradução",
-    icon: FileText,
-    count: 234,
-    gradient: "from-rose-500 to-pink-500",
-    popular: false
-  },
-  {
-    name: "Vídeo & Animação",
+    name: 'Vídeo & Animação',
+    description: 'Motion graphics e produção audiovisual',
     icon: Video,
-    count: 345,
-    gradient: "from-violet-500 to-purple-500",
-    popular: false
+    href: '/services?category=video',
+    serviceCount: 743,
+    gradient: 'from-red-500 to-rose-500',
   },
   {
-    name: "Mobile Apps",
-    icon: Smartphone,
-    count: 189,
-    gradient: "from-cyan-500 to-blue-500",
-    popular: false
+    name: 'Música & Áudio',
+    description: 'Produção musical e locução',
+    icon: Music,
+    href: '/services?category=musica',
+    serviceCount: 534,
+    gradient: 'from-indigo-500 to-purple-500',
   },
   {
-    name: "Consultoria",
-    icon: Briefcase,
-    count: 167,
-    gradient: "from-emerald-500 to-teal-500",
-    popular: false
-  }
+    name: 'Marketing Digital',
+    description: 'SEO, ads e redes sociais',
+    icon: Megaphone,
+    href: '/services?category=marketing',
+    serviceCount: 1678,
+    gradient: 'from-teal-500 to-green-500',
+    popular: true,
+  },
+  {
+    name: 'Negócios',
+    description: 'Consultoria e estratégia empresarial',
+    icon: TrendingUp,
+    href: '/services?category=negocios',
+    serviceCount: 967,
+    gradient: 'from-slate-500 to-gray-500',
+  },
+  {
+    name: 'Tradução',
+    description: 'Tradução e interpretação',
+    icon: Languages,
+    href: '/services?category=traducao',
+    serviceCount: 423,
+    gradient: 'from-violet-500 to-purple-500',
+  },
+  {
+    name: 'Suporte Técnico',
+    description: 'Manutenção e assistência',
+    icon: Headphones,
+    href: '/services?category=suporte',
+    serviceCount: 654,
+    gradient: 'from-cyan-500 to-blue-500',
+  },
 ];
 
-export function CategoryGrid() {
+interface CategoryGridProps {
+  className?: string;
+  limit?: number;
+  showServiceCount?: boolean;
+}
+
+export function CategoryGrid({ 
+  className, 
+  limit,
+  showServiceCount = true 
+}: CategoryGridProps) {
+  const displayCategories = limit ? categories.slice(0, limit) : categories;
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-      {categories.map((category) => {
+    <div 
+      className={cn(
+        "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4",
+        className
+      )}
+    >
+      {displayCategories.map((category) => {
         const Icon = category.icon;
+        
         return (
-          <Card 
-            key={category.name} 
-            className="group cursor-pointer hover:shadow-elegant transition-all duration-300 hover:-translate-y-1 bg-gradient-card border-0 relative overflow-hidden"
-          >
-            <CardContent className="p-6 text-center">
-              <div className={`w-12 h-12 mx-auto mb-3 rounded-lg bg-gradient-to-br ${category.gradient} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                <Icon className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="font-semibold text-sm mb-1 group-hover:text-primary transition-colors">
-                {category.name}
-              </h3>
-              <p className="text-xs text-muted-foreground">
-                {category.count.toLocaleString()} serviços
-              </p>
-              {category.popular && (
-                <Badge 
-                  variant="secondary" 
-                  className="absolute top-2 right-2 text-xs bg-gradient-primary text-primary-foreground border-0"
-                >
-                  Popular
-                </Badge>
-              )}
-            </CardContent>
-          </Card>
+          <Link key={category.name} href={category.href}>
+            <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+              <CardContent className="p-6">
+                <div className="relative">
+                  {/* Background Gradient */}
+                  <div 
+                    className={cn(
+                      "absolute inset-0 bg-gradient-to-br opacity-10 rounded-lg transition-opacity group-hover:opacity-20",
+                      category.gradient.replace('from-', 'from-').replace('to-', 'to-')
+                    )}
+                  />
+                  
+                  {/* Content */}
+                  <div className="relative">
+                    <div className="flex items-center justify-between mb-3">
+                      <div 
+                        className={cn(
+                          "p-3 rounded-lg bg-gradient-to-br",
+                          category.gradient
+                        )}
+                      >
+                        <Icon className="h-6 w-6 text-white" />
+                      </div>
+                      {category.popular && (
+                        <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full font-medium">
+                          Popular
+                        </span>
+                      )}
+                    </div>
+                    
+                    <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">
+                      {category.name}
+                    </h3>
+                    
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {category.description}
+                    </p>
+                    
+                    {showServiceCount && (
+                      <p className="text-xs text-muted-foreground">
+                        {category.serviceCount.toLocaleString()} serviços disponíveis
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
         );
       })}
     </div>
