@@ -1,0 +1,1 @@
+from django.apps import AppConfig\n\n\nclass IngestConfig(AppConfig):\n    default_auto_field = 'django.db.models.BigAutoField'\n    name = 'apps.ingest'\n    verbose_name = 'Ingestão de Dados Acadêmicos'

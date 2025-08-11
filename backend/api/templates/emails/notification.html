@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ notification.title }}</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            background: #f8f9fa;
+            padding: 30px 20px;
+            border-radius: 0 0 8px 8px;
+        }
+        .notification-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .priority-urgent { border-left: 4px solid #dc3545; }
+        .priority-high { border-left: 4px solid #fd7e14; }
+        .priority-medium { border-left: 4px solid #ffc107; }
+        .priority-low { border-left: 4px solid #28a745; }
+        .button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>GalaxIA</h1>
+        <p>Marketplace de Serviços Profissionais</p>
+    </div>
+    
+    <div class="content">
+        <div class="notification-card priority-{{ notification.priority }}">
+            <h2>{{ notification.title }}</h2>
+            <p>{{ notification.message }}</p>
+            
+            {% if notification.action_url %}
+                <a href="{{ site_url }}{{ notification.action_url }}" class="button">
+                    Ver Detalhes
+                </a>
+            {% endif %}
+        </div>
+        
+        <p>Olá {{ user.first_name|default:user.username }},</p>
+        <p>Você recebeu uma nova notificação na GalaxIA.</p>
+        
+        <p>
+            <strong>Tipo:</strong> {{ notification.get_notification_type_display }}<br>
+            <strong>Data:</strong> {{ notification.created_at|date:"d/m/Y H:i" }}<br>
+            <strong>Prioridade:</strong> {{ notification.get_priority_display }}
+        </p>
+        
+        {% if notification.data %}
+            <h3>Informações Adicionais:</h3>
+            <ul>
+                {% for key, value in notification.data.items %}
+                    <li><strong>{{ key }}:</strong> {{ value }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
+    <div class="footer">
+        <p>
+            Esta é uma notificação automática da GalaxIA.<br>
+            Para alterar suas preferências de notificação, 
+            <a href="{{ site_url }}/settings/notifications">clique aqui</a>.
+        </p>
+        <p>
+            GalaxIA - Conectando talentos, criando oportunidades<br>
+            © {{ "now"|date:"Y" }} GalaxIA. Todos os direitos reservados.
+        </p>
+    </div>
+</body>
+</html>
+
+

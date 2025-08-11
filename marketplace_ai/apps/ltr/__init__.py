@@ -1,0 +1,1 @@
+"""\nAprendizado de ranking automático com XGBoost.\n\n* utils.py — métricas de avaliação (nDCG etc.)\n* management/commands/train_ltr.py — comando para treinar modelo\n"""

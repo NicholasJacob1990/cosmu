@@ -1,0 +1,1 @@
+"""\nApp de ingestão de dados externos.\n\n* tasks.py — coleta dados acadêmicos (ORCID, Lattes, LinkedIn)\n* Calcula academic_score baseado em grau + ranking universidade\n"""
