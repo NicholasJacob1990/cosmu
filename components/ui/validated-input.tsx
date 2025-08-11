@@ -1,201 +1,155 @@
-import React, { useState, useEffect } from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { validation, useRealTimeValidation } from '@/lib/validation';
-import { CheckCircle, AlertCircle, Eye, EyeOff } from 'lucide-react';
-import { cn } from '@/lib/utils';
+"use client";
 
-interface ValidatedInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
-  fieldName: string;
-  entityType?: 'pf' | 'pj';
-  onValidationChange?: (isValid: boolean) => void;
+import React, { useMemo, useState } from "react";
+import { Input } from "./input";
+import { Label } from "./label";
+import { cn } from "../../lib/utils";
+
+type PasswordStrength = "weak" | "medium" | "strong";
+
+export interface ValidatedInputProps {
+  label?: string;
+  fieldName?: string;
+  type?: string;
+  placeholder?: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  required?: boolean;
+  entityType?: "pf" | "pj";
   showPasswordStrength?: boolean;
+  className?: string;
+}
+
+function isValidEmail(email: string): boolean {
+  return /[^\s@]+@[^\s@]+\.[^\s@]+/.test(email);
+}
+
+function onlyDigits(value: string): string {
+  return value.replace(/\D/g, "");
+}
+
+// CPF validation (basic algorithm: digits and verifying digits)
+function isValidCPF(cpf: string): boolean {
+  const digits = onlyDigits(cpf);
+  if (digits.length !== 11 || /^([0-9])\1+$/.test(digits)) return false;
+  const calc = (baseLen: number) => {
+    let sum = 0;
+    for (let i = 0; i < baseLen; i++) sum += parseInt(digits[i], 10) * (baseLen + 1 - i);
+    const mod = (sum * 10) % 11;
+    return mod === 10 ? 0 : mod;
+  };
+  const d1 = calc(9);
+  const d2 = calc(10);
+  return d1 === parseInt(digits[9], 10) && d2 === parseInt(digits[10], 10);
+}
+
+// CNPJ validation (basic algorithm)
+function isValidCNPJ(cnpj: string): boolean {
+  const digits = onlyDigits(cnpj);
+  if (digits.length !== 14 || /^([0-9])\1+$/.test(digits)) return false;
+  const calc = (len: number) => {
+    const factors = len === 12
+      ? [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+      : [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    let sum = 0;
+    for (let i = 0; i < factors.length; i++) sum += parseInt(digits[i], 10) * factors[i];
+    const mod = sum % 11;
+    return mod < 2 ? 0 : 11 - mod;
+  };
+  const d1 = calc(12);
+  const d2 = calc(13);
+  return d1 === parseInt(digits[12], 10) && d2 === parseInt(digits[13], 10);
+}
+
+function isValidPhoneBR(phone: string): boolean {
+  // Accept formats like (11) 98765-4321 or 11987654321
+  const digits = onlyDigits(phone);
+  return digits.length === 10 || digits.length === 11;
+}
+
+function getPasswordStrength(password: string): PasswordStrength {
+  let score = 0;
+  if (password.length >= 8) score++;
+  if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score++;
+  if (/\d/.test(password) && /[^A-Za-z0-9]/.test(password)) score++;
+  if (password.length >= 12) score++;
+  if (score >= 3) return "strong";
+  if (score === 2) return "medium";
+  return "weak";
 }
 
 export function ValidatedInput({
   label,
   fieldName,
-  entityType,
-  value = '',
+  type = "text",
+  placeholder,
+  value,
   onChange,
-  onValidationChange,
-  showPasswordStrength = false,
-  type = 'text',
+  required,
+  entityType,
+  showPasswordStrength,
   className,
-  ...props
 }: ValidatedInputProps) {
-  const [localValue, setLocalValue] = useState(value as string);
-  const [error, setError] = useState<string | null>(null);
-  const [isValid, setIsValid] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState<any>(null);
-  const { validateField, formatField } = useRealTimeValidation();
+  const [touched, setTouched] = useState(false);
 
-  // Sincronizar com valor externo
-  useEffect(() => {
-    setLocalValue(value as string);
-  }, [value]);
-
-  // Validação em tempo real
-  useEffect(() => {
-    if (localValue) {
-      const errorMessage = validateField(fieldName, localValue, entityType);
-      setError(errorMessage);
-      setIsValid(!errorMessage);
-      
-      // Força callback de validação
-      onValidationChange?.(!errorMessage);
-
-      // Análise de força da senha
-      if (fieldName === 'password' && showPasswordStrength) {
-        setPasswordStrength(validation.password.getStrength(localValue));
-      }
-    } else {
-      setError(null);
-      setIsValid(false);
-      onValidationChange?.(false);
-      setPasswordStrength(null);
+  const validation = useMemo(() => {
+    if (!touched && !value) return { valid: true, message: "" };
+    switch (fieldName) {
+      case "email":
+        return { valid: isValidEmail(value), message: isValidEmail(value) ? "" : "Email inválido" };
+      case "cpf":
+        return { valid: isValidCPF(value), message: isValidCPF(value) ? "" : "CPF inválido" };
+      case "cnpj":
+        return { valid: isValidCNPJ(value), message: isValidCNPJ(value) ? "" : "CNPJ inválido" };
+      case "phone":
+      case "companyPhone":
+        return { valid: isValidPhoneBR(value), message: isValidPhoneBR(value) ? "" : "Telefone inválido" };
+      default:
+        if (required) return { valid: Boolean(String(value).trim()), message: String(value).trim() ? "" : "Campo obrigatório" };
+        return { valid: true, message: "" };
     }
-  }, [localValue, fieldName, entityType, onValidationChange, showPasswordStrength]);
+  }, [fieldName, required, touched, value]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let newValue = e.target.value;
+  const strength: PasswordStrength | null = useMemo(() => {
+    if (!showPasswordStrength || type !== "password") return null;
+    return getPasswordStrength(value);
+  }, [showPasswordStrength, type, value]);
 
-    // Formatação automática para alguns campos
-    if (['cpf', 'cnpj', 'phone', 'cep'].includes(fieldName)) {
-      newValue = formatField(fieldName, newValue);
-    }
-
-    setLocalValue(newValue);
-    
-    // Chama onChange externo com valor formatado
-    if (onChange) {
-      const syntheticEvent = {
-        ...e,
-        target: { ...e.target, value: newValue }
-      };
-      onChange(syntheticEvent as React.ChangeEvent<HTMLInputElement>);
-    }
-  };
-
-  const isPasswordField = type === 'password' || fieldName === 'password';
-  const inputType = isPasswordField ? (showPassword ? 'text' : 'password') : type;
+  const borderClass = validation.valid ? "" : "border-red-500 focus-visible:ring-red-500";
 
   return (
-    <div className="space-y-2">
-      <Label htmlFor={fieldName} className="text-sm font-medium">
-        {label}
-        {props.required && <span className="text-red-500 ml-1">*</span>}
-      </Label>
-      
-      <div className="relative">
-        <Input
-          {...props}
-          id={fieldName}
-          type={inputType}
-          value={localValue}
-          onChange={handleInputChange}
-          className={cn(
-            className,
-            error && 'border-red-500 focus:border-red-500',
-            isValid && localValue && 'border-green-500 focus:border-green-500',
-            isPasswordField && 'pr-10'
-          )}
-        />
-        
-        {/* Ícone de validação */}
-        {localValue && !isPasswordField && (
-          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-            {isValid ? (
-              <CheckCircle className="h-4 w-4 text-green-500" />
-            ) : (
-              <AlertCircle className="h-4 w-4 text-red-500" />
-            )}
-          </div>
-        )}
-
-        {/* Toggle para mostrar/ocultar senha */}
-        {isPasswordField && (
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-          >
-            {showPassword ? (
-              <EyeOff className="h-4 w-4" />
-            ) : (
-              <Eye className="h-4 w-4" />
-            )}
-          </button>
-        )}
-      </div>
-
-      {/* Mensagem de erro */}
-      {error && (
-        <p className="text-sm text-red-600 flex items-center gap-1">
-          <AlertCircle className="h-3 w-3" />
-          {error}
-        </p>
+    <div className={cn("space-y-2", className)}>
+      {label && <Label htmlFor={fieldName}>{label}{required ? " *" : ""}</Label>}
+      <Input
+        id={fieldName}
+        name={fieldName}
+        type={type}
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => {
+          if (fieldName === "cpf" || fieldName === "cnpj" || fieldName === "phone" || fieldName === "companyPhone") {
+            // allow user to type freely but keep value as is; validation uses digits
+          }
+          onChange(e);
+        }}
+        onBlur={() => setTouched(true)}
+        className={cn(borderClass)}
+        required={required}
+      />
+      {!validation.valid && (
+        <p className="text-xs text-red-600">{validation.message}</p>
       )}
-
-      {/* Indicador de força da senha */}
-      {showPasswordStrength && passwordStrength && localValue && (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-gray-600">Força da senha:</span>
-            <span className={cn("text-xs font-medium", passwordStrength.color)}>
-              {passwordStrength.label}
-            </span>
-          </div>
-          
-          {/* Barra de progresso */}
-          <div className="w-full bg-gray-200 rounded-full h-1.5">
-            <div
-              className={cn(
-                "h-1.5 rounded-full transition-all duration-300",
-                passwordStrength.score <= 1 && "bg-red-500",
-                passwordStrength.score === 2 && "bg-red-400", 
-                passwordStrength.score === 3 && "bg-yellow-500",
-                passwordStrength.score === 4 && "bg-green-500",
-                passwordStrength.score === 5 && "bg-green-600"
-              )}
-              style={{ width: `${(passwordStrength.score / 5) * 100}%` }}
-            />
-          </div>
-
-          {/* Lista de requisitos */}
-          <div className="space-y-1">
-            {passwordStrength.requirements.map((req: any, index: number) => (
-              <div key={index} className="flex items-center gap-2 text-xs">
-                <div className={cn(
-                  "w-2 h-2 rounded-full",
-                  req.met ? "bg-green-500" : "bg-gray-300"
-                )}>
-                </div>
-                <span className={cn(
-                  req.met ? "text-green-600" : "text-gray-500"
-                )}>
-                  {req.text}
-                </span>
-              </div>
-            ))}
-          </div>
+      {strength && (
+        <div className="flex items-center gap-2">
+          <div className={cn("h-1.5 w-16 rounded", strength === "weak" && "bg-red-500", strength === "medium" && "bg-yellow-500", strength === "strong" && "bg-green-500")}></div>
+          <span className={cn("text-xs", strength === "weak" && "text-red-600", strength === "medium" && "text-yellow-700", strength === "strong" && "text-green-700")}>{strength === "weak" ? "Fraca" : strength === "medium" ? "Média" : "Forte"}</span>
         </div>
-      )}
-
-      {/* Mensagem de sucesso */}
-      {isValid && localValue && !error && (
-        <p className="text-sm text-green-600 flex items-center gap-1">
-          <CheckCircle className="h-3 w-3" />
-          {fieldName === 'cpf' && 'CPF válido'}
-          {fieldName === 'cnpj' && 'CNPJ válido'}
-          {fieldName === 'email' && 'Email válido'}
-          {fieldName === 'phone' && 'Telefone válido'}
-          {fieldName === 'cep' && 'CEP válido'}
-          {fieldName === 'password' && 'Senha forte'}
-        </p>
       )}
     </div>
   );
 }
+
+export default ValidatedInput;
+
+
+

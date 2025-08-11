@@ -1,51 +1,23 @@
-import Image from 'next/image';
-import { useTheme } from '@/hooks/useTheme';
+import { cn } from '@/lib/utils';
 
 interface GalaxiaLogoProps {
   className?: string;
-  width?: number;
-  height?: number;
   showText?: boolean;
 }
 
-export function GalaxiaLogo({
-  className = "",
-  showText = true
-}: GalaxiaLogoProps) {
-  const { theme } = useTheme();
-
+export function GalaxiaLogo({ className, showText = true }: GalaxiaLogoProps) {
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      <Image
-        src="/brand/logos/galaxia-icon.png"
-        alt="Galaxia Icon"
-        width={40}
-        height={40}
-        className="transition-all duration-300"
-      />
+    <div className={cn("flex items-center gap-2", className)}>
+      <div className="relative w-10 h-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg rotate-45"></div>
+        <div className="absolute inset-2 bg-white dark:bg-gray-900 rounded rotate-45"></div>
+        <div className="absolute inset-3 bg-gradient-to-br from-purple-600 to-pink-600 rounded rotate-45"></div>
+      </div>
       {showText && (
-        <span className="text-2xl font-bold">
-          Galax<span className="text-primary">IA</span>
+        <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          GalaxIA
         </span>
       )}
     </div>
-  );
-}
-
-export function GalaxiaIcon({
-  className = "",
-  size = 32
-}: {
-  className?: string;
-  size?: number;
-}) {
-  return (
-    <Image
-      src="/brand/logos/galaxia-icon.png"
-      alt="Galaxia Icon"
-      width={size}
-      height={size}
-      className={`transition-all duration-300 ${className}`}
-    />
   );
 }

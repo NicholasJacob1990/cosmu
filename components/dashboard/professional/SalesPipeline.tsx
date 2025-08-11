@@ -1,90 +1,40 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+"use client";
 
-const hotLeads = [
-  {
-    title: 'E-commerce Completo',
-    client: 'Startup Food',
-    value: 15000,
-    status: 'Reunião agendada: Amanhã 14h',
-    statusType: 'meeting'
-  },
-  {
-    title: 'Rebranding Corporativo',
-    client: 'Empresa Tech',
-    value: 8500,
-    status: 'Aguardando aprovação',
-    statusType: 'pending'
-  },
-];
-
-const warmLeads = [
-    {
-        title: 'Logo + Identidade',
-        client: 'Clínica',
-        value: 2800,
-    },
-    {
-        title: 'Website Responsivo',
-        client: 'Consultoria',
-        value: 4200,
-    },
-];
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useDashboardStore } from "@/store/dashboardStore";
+import { useSalesPipeline } from "@/lib/api/hooks/useMetrics";
 
 export function SalesPipeline() {
+  const user = useDashboardStore((s) => s.user);
+  const professionalId = user?.id || "professional-1";
+  const { data } = useSalesPipeline(professionalId);
+
+  const stages = data?.stages ?? [];
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>💰 Pipeline de Vendas Avançado</CardTitle>
-        <CardDescription>Funil de vendas e oportunidades</CardDescription>
+        <CardTitle>Funil de Vendas</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div>
-            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                <span className="text-red-500">🔥</span>
-                QUENTES
-                <Badge variant="destructive">R$ 28.000 (Prob. 85%)</Badge>
-            </h3>
-            <div className="space-y-3">
-                {hotLeads.map(lead => (
-                    <div key={lead.title} className="p-3 border rounded-md">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <p className="font-semibold">{lead.title} <span className="font-normal text-muted-foreground">• {lead.client}</span></p>
-                                <p className="text-sm text-primary font-medium">R$ {lead.value.toLocaleString()}</p>
-                            </div>
-                            <Button size="sm" variant="secondary">Detalhes</Button>
-                        </div>
-                        <p className={`text-xs mt-1 ${lead.statusType === 'meeting' ? 'text-green-600' : 'text-yellow-600'}`}>{lead.status}</p>
-                    </div>
-                ))}
+      <CardContent className="space-y-3">
+        {stages.map((s: any) => (
+          <div key={s.name} className="flex items-center justify-between border rounded p-3">
+            <div className="text-sm font-medium">{s.name}</div>
+            <div className="text-xs text-muted-foreground">
+              {s.opportunities} oportunidades • R$ {s.amount.toLocaleString('pt-BR')} • Prob. {Math.round((s.probability || 0) * 100)}%
             </div>
-        </div>
-
-        <div>
-            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                <span className="text-yellow-500">🟡</span>
-                MORNOS
-                <Badge variant="secondary">R$ 17.500 (Prob. 45%)</Badge>
-            </h3>
-            <div className="space-y-3">
-                {warmLeads.map(lead => (
-                    <div key={lead.title} className="p-3 border rounded-md flex justify-between items-center">
-                        <div>
-                            <p className="font-semibold">{lead.title} <span className="font-normal text-muted-foreground">• {lead.client}</span></p>
-                            <p className="text-sm text-primary font-medium">R$ {lead.value.toLocaleString()}</p>
-                        </div>
-                        <Button size="sm" variant="outline">Ver</Button>
-                    </div>
-                ))}
-            </div>
-        </div>
-
-        <div className="text-center text-sm text-muted-foreground pt-4 border-t">
-            Taxa Conversão Média: 67% • Tempo Médio Fechamento: 4.2d
-        </div>
+          </div>
+        ))}
+        {stages.length === 0 && (
+          <div className="text-sm text-muted-foreground">Sem dados de pipeline.</div>
+        )}
       </CardContent>
     </Card>
   );
-} 
+}
+
+export default SalesPipeline;
+
+
+
+
