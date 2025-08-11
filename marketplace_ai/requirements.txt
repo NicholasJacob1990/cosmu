@@ -1,0 +1,1 @@
+Django>=5.0,<6.0\ndjangorestframework>=3.15\ncelery[redis]>=5.4\nredis>=5.0\nopensearch-py>=2.3\npgvector>=0.2.4\npsycopg[binary]>=3.1\npydantic>=2.7\nxgboost>=2.0\npandas>=2.2\npython-dotenv>=1.0\ngeopy>=2.4\ndjango-prometheus>=2.3\ndjango-waffle>=3.0\nopenai>=1.14\nwatchdog[watchmedo]>=3.0\nFaker>=23.3\nbeautifulsoup4>=4.12\nscikit-learn>=1.3\nnumpy>=1.24\nrequests>=2.31

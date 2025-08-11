@@ -1,0 +1,32 @@
+GalaxIA - {{ notification.title }}
+
+Olá {{ user.first_name|default:user.username }},
+
+Você recebeu uma nova notificação na GalaxIA:
+
+{{ notification.title }}
+{{ notification.message }}
+
+Detalhes:
+- Tipo: {{ notification.get_notification_type_display }}
+- Data: {{ notification.created_at|date:"d/m/Y H:i" }}
+- Prioridade: {{ notification.get_priority_display }}
+
+{% if notification.data %}
+Informações Adicionais:
+{% for key, value in notification.data.items %}
+- {{ key }}: {{ value }}
+{% endfor %}
+{% endif %}
+
+{% if notification.action_url %}
+Ver mais detalhes: {{ site_url }}{{ notification.action_url }}
+{% endif %}
+
+---
+GalaxIA - Marketplace de Serviços Profissionais
+Para alterar suas preferências de notificação: {{ site_url }}/settings/notifications
+
+© {{ "now"|date:"Y" }} GalaxIA. Todos os direitos reservados.
+
+
